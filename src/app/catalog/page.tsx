@@ -6,7 +6,6 @@ import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 import { useApp } from '@/lib/context';
 import { getTranslation } from '@/lib/i18n';
-import products from '@/data/products.json';
 import { ArrowRight, Filter, Search, X, ChevronDown } from 'lucide-react';
 
 type Product = {
@@ -33,10 +32,10 @@ type Product = {
   images: string[];
 };
 
-const allProducts = products as unknown as Product[];
-
 export default function CatalogPage() {
   const { language, currency } = useApp();
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({
     brand: '',
@@ -52,9 +51,29 @@ export default function CatalogPage() {
   });
   const [sortBy, setSortBy] = useState('newest');
 
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:3003/api/products');
+        const data = await response.json();
+        setAllProducts(data);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        // Fallback to local JSON if API fails
+        const localProducts = (await import('@/data/products.json')).default;
+        setAllProducts(localProducts as unknown as Product[]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   // Get unique values for filters
-  const uniqueBrands = useMemo(() => Array.from(new Set(allProducts.map(p => p.brand))), []);
-  const uniqueMounts = useMemo(() => Array.from(new Set(allProducts.map(p => p.mount).filter(m => m !== 'N/A'))), []);
+  const uniqueBrands = useMemo(() => Array.from(new Set(allProducts.map(p => p.brand))), [allProducts]);
+  const uniqueMounts = useMemo(() => Array.from(new Set(allProducts.map(p => p.mount).filter(m => m !== 'N/A'))), [allProducts]);
 
   // Initialize filters from URL params
   useEffect(() => {
@@ -112,7 +131,7 @@ export default function CatalogPage() {
     });
 
     return filtered;
-  }, [filters, sortBy, currency, language]);
+  }, [allProducts, filters, sortBy, currency, language]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => {
@@ -388,7 +407,11 @@ export default function CatalogPage() {
 
           {/* Products Grid */}
           <div className="flex-1">
-            {filteredAndSortedProducts.length === 0 ? (
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg">Loading products...</p>
+              </div>
+            ) : filteredAndSortedProducts.length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-muted-foreground text-lg">
                   {getTranslation(language, 'catalog.noProducts')}

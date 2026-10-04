@@ -7,7 +7,6 @@ import { Footer } from '@/components/Footer';
 import { useApp } from '@/lib/context';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
-import products from '@/data/products.json';
 import { ArrowLeft, ChevronLeft, ChevronRight, Instagram, Mail } from 'lucide-react';
 
 type Product = {
@@ -28,17 +27,52 @@ type Product = {
   status?: 'available' | 'sold';
 };
 
-const allProducts = products as unknown as Product[];
-
 export default function ProductPage() {
   const { language, currency } = useApp();
   const params = useParams();
   const slug = params.slug as string;
 
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const product = allProducts.find((p) => p.slug === slug);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:3003/api/products');
+        const data = await response.json();
+        setAllProducts(data);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        // Fallback to local JSON if API fails
+        const localProducts = (await import('@/data/products.json')).default;
+        setAllProducts(localProducts as unknown as Product[]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchProducts();
+  }, []);
+
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <p className="text-gray-900">Loading product...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
