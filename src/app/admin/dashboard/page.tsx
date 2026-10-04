@@ -64,7 +64,8 @@ export default function AdminDashboard() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3003/api/products');
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'}';
+      const response = await fetch(`${apiUrl}/api/products`);
       const data = await response.json();
       console.log('Fetched products:', data);
       setProducts(data);
@@ -91,7 +92,8 @@ export default function AdminDashboard() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:3003/api/upload', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
+      const response = await fetch(`${apiUrl}/api/upload`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -124,9 +126,10 @@ export default function AdminDashboard() {
     e.preventDefault();
 
     const token = localStorage.getItem('adminToken');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
     const url = editingProduct
-      ? `http://localhost:3003/api/products/${editingProduct.id}`
-      : 'http://localhost:3003/api/products';
+      ? `${apiUrl}/api/products/${editingProduct.id}`
+      : `${apiUrl}/api/products`;
 
     const payload = {
       slug: formData.slug,
@@ -196,8 +199,9 @@ export default function AdminDashboard() {
     if (!confirm('Are you sure you want to delete this product?')) return;
 
     const token = localStorage.getItem('adminToken');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
     try {
-      const response = await fetch(`http://localhost:3003/api/products/${id}`, {
+      const response = await fetch(`${apiUrl}/api/products/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

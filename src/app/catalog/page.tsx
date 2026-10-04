@@ -55,7 +55,8 @@ export default function CatalogPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch('http://localhost:3003/api/products');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
+        const response = await fetch(`${apiUrl}/api/products`);
         const data = await response.json();
         setAllProducts(data);
       } catch (error) {
