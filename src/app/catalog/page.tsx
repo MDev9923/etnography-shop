@@ -134,18 +134,6 @@ export default function CatalogPage() {
     return filtered;
   }, [allProducts, filters, sortBy, currency, language]);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => {
-      if (key === 'showSold') {
-        return { ...prev, showSold: value === 'true' };
-      }
-      if (key === 'category' && value !== 'film') {
-        return { ...prev, category: value, filmType: '' };
-      }
-      return { ...prev, [key]: value };
-    });
-  };
-
   const clearFilters = () => {
     setFilters({
       brand: '',
@@ -177,7 +165,7 @@ export default function CatalogPage() {
       <div className="mb-6">
         <button
           type="button"
-          onClick={() => handleFilterChange('showSold', filters.showSold ? '' : 'true')}
+          onClick={() => setFilters(prev => ({ ...prev, showSold: !prev.showSold }))}
           className={`w-full px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors ${
             filters.showSold
               ? 'bg-primary text-primary-foreground hover:bg-accent'
@@ -196,7 +184,7 @@ export default function CatalogPage() {
         <input
           type="text"
           value={filters.search}
-          onChange={(e) => handleFilterChange('search', e.target.value)}
+          onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
           placeholder={getTranslation(language, 'common.search')}
         />
@@ -209,7 +197,7 @@ export default function CatalogPage() {
         </label>
         <select
           value={filters.brand}
-          onChange={(e) => handleFilterChange('brand', e.target.value)}
+          onChange={(e) => setFilters(prev => ({ ...prev, brand: e.target.value }))}
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">{language === 'en' ? 'All Brands' : 'Сите Брендови'}</option>
@@ -226,7 +214,7 @@ export default function CatalogPage() {
         </label>
         <select
           value={filters.category}
-          onChange={(e) => handleFilterChange('category', e.target.value)}
+          onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value, filmType: '' }))}
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">{language === 'en' ? 'All Categories' : 'Сите Категории'}</option>
@@ -244,7 +232,7 @@ export default function CatalogPage() {
         </label>
         <select
           value={filters.filmDigital}
-          onChange={(e) => handleFilterChange('filmDigital', e.target.value)}
+          onChange={(e) => setFilters(prev => ({ ...prev, filmDigital: e.target.value }))}
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">{language === 'en' ? 'All Types' : 'Сите Типови'}</option>
@@ -262,7 +250,7 @@ export default function CatalogPage() {
           </label>
           <select
             value={filters.filmType}
-            onChange={(e) => handleFilterChange('filmType', e.target.value)}
+            onChange={(e) => setFilters(prev => ({ ...prev, filmType: e.target.value }))}
             className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
           >
             <option value="">{language === 'en' ? 'All Film Types' : 'Сите типови филм'}</option>
@@ -282,7 +270,7 @@ export default function CatalogPage() {
           </label>
           <select
             value={filters.mount}
-            onChange={(e) => handleFilterChange('mount', e.target.value)}
+            onChange={(e) => setFilters(prev => ({ ...prev, mount: e.target.value }))}
             className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
           >
             <option value="">{language === 'en' ? 'All Mounts' : 'Сите Монти'}</option>
@@ -300,7 +288,7 @@ export default function CatalogPage() {
         </label>
         <select
           value={filters.condition}
-          onChange={(e) => handleFilterChange('condition', e.target.value)}
+          onChange={(e) => setFilters(prev => ({ ...prev, condition: e.target.value }))}
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">{language === 'en' ? 'All Conditions' : 'Сите Состојби'}</option>
@@ -322,14 +310,14 @@ export default function CatalogPage() {
           <input
             type="number"
             value={filters.minPrice}
-            onChange={(e) => handleFilterChange('minPrice', e.target.value)}
+            onChange={(e) => setFilters(prev => ({ ...prev, minPrice: e.target.value }))}
             className="w-1/2 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
             placeholder={language === 'en' ? 'Min' : 'Мин'}
           />
           <input
             type="number"
             value={filters.maxPrice}
-            onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
+            onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
             className="w-1/2 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
             placeholder={language === 'en' ? 'Max' : 'Макс'}
           />

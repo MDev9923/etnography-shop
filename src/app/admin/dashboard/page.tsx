@@ -526,37 +526,84 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Film/Digital
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.film_digital}
                       onChange={(e) => setFormData({ ...formData, film_digital: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white text-gray-900"
-                      placeholder="e.g., film, digital, analog"
-                    />
+                    >
+                      <option value="">Select...</option>
+                      <option value="film">Film</option>
+                      <option value="digital">Digital</option>
+                      <option value="analog">Analog</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Film Type
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.film_type}
                       onChange={(e) => setFormData({ ...formData, film_type: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white text-gray-900"
-                      placeholder="e.g., 35mm-color, 120-color"
-                    />
+                    >
+                      <option value="">Select...</option>
+                      <option value="35mm-color">35mm Color</option>
+                      <option value="35mm-bw">35mm B&W</option>
+                      <option value="120-color">120 Color</option>
+                      <option value="120-bw">120 B&W</option>
+                      <option value="instant">Instant</option>
+                      <option value="medium-format">Medium Format</option>
+                      <option value="large-format">Large Format</option>
+                      <option value="aps">APS</option>
+                      <option value="110">110</option>
+                      <option value="disc">Disc</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Mount
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={formData.mount}
                       onChange={(e) => setFormData({ ...formData, mount: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white text-gray-900"
-                      placeholder="e.g., F, EF, E, M42"
-                    />
+                    >
+                      <option value="">Select...</option>
+                      <option value="F">Nikon F</option>
+                      <option value="EF">Canon EF</option>
+                      <option value="EF-S">Canon EF-S</option>
+                      <option value="E">Nikon Z</option>
+                      <option value="RF">Canon RF</option>
+                      <option value="M42">M42 Screw</option>
+                      <option value="M">Leica M</option>
+                      <option value="L">Sony E</option>
+                      <option value="X">Fujifilm X</option>
+                      <option value="K">Pentax K</option>
+                      <option value="OM">Olympus OM</option>
+                      <option value="PK">Pentax K</option>
+                      <option value="C">Contax C/Y</option>
+                      <option value="MD">Minolta MD</option>
+                      <option value="A">Minolta/Sony A</option>
+                      <option value="SA">Sigma SA</option>
+                      <option value="4/3">Four Thirds</option>
+                      <option value="m4/3">Micro Four Thirds</option>
+                      <option value="G">Canon G</option>
+                      <option value="NX">Samsung NX</option>
+                      <option value="Q">Pentax Q</option>
+                      <option value="T">Leica T</option>
+                      <option value="SL">Leica SL</option>
+                      <option value="S">Leica S</option>
+                      <option value="TL">Leica TL</option>
+                      <option value="CL">Leica CL</option>
+                      <option value="CINE">Canon CINE</option>
+                      <option value="PL">PL Mount</option>
+                      <option value="MFT">MFT</option>
+                      <option value="EF-M">Canon EF-M</option>
+                      <option value="FT">Olympus FT</option>
+                      <option value="PK-M42">Pentax K/M42</option>
+                      <option value="T2">Contax T2</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
                 </div>
 
