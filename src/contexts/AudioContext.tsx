@@ -25,45 +25,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     audio.preload = 'auto';
     audio.volume = 0.35;
 
-    // Start muted to maximize autoplay success
+    // Start muted and not playing by default
     audio.muted = true;
     audioRef.current = audio;
 
-    const tryPlay = async () => {
-      try {
-        await audio.play();
-        setIsPlaying(true);
-      } catch {
-        // Autoplay blocked until user interaction
-        setIsPlaying(false);
-      }
-    };
-
-    tryPlay();
-
-    // On first interaction: unmute + play
-    const onFirstInteraction = async () => {
-      const a = audioRef.current;
-      if (!a) return;
-
-      try {
-        a.muted = false;
-        setIsMuted(false);
-
-        await a.play();
-        setIsPlaying(true);
-      } catch {
-        setIsPlaying(false);
-      }
-    };
-
-    window.addEventListener('click', onFirstInteraction, { once: true });
-    window.addEventListener('touchstart', onFirstInteraction, { once: true });
+    // Don't auto-play - user must explicitly enable music
 
     return () => {
-      window.removeEventListener('click', onFirstInteraction);
-      window.removeEventListener('touchstart', onFirstInteraction);
-
       audio.pause();
       audioRef.current = null;
     };
@@ -92,9 +60,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     } else {
       audio.muted = true;
       setIsMuted(true);
-      // If you prefer pausing instead of muting, uncomment:
-      // audio.pause();
-      // setIsPlaying(false);
+      audio.pause();
+      setIsPlaying(false);
     }
   };
 
