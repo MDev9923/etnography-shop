@@ -6,6 +6,38 @@ import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
 import { Eye } from 'lucide-react';
 
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
+).replace(/\/+$/, '');
+
+function getImageUrl(value?: string): string {
+  let url = value?.trim() || '';
+
+  if (!url) {
+    return '/placeholder-product.jpg';
+  }
+
+  // Repair URLs that accidentally contain the API URL before an R2 URL.
+  while (
+    url.startsWith(API_URL) &&
+    /^https?:\/\//i.test(url.slice(API_URL.length))
+  ) {
+    url = url.slice(API_URL.length);
+  }
+
+  // Preserve complete R2 and other public image URLs.
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  // Support older images served by the backend.
+  if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+    return `${API_URL}/${url.replace(/^\/+/, '')}`;
+  }
+
+  return url;
+}
+
 interface Product {
   id: number;
   slug: string;
@@ -23,7 +55,7 @@ interface Product {
     en: string;
     mk: string;
   };
-  specs: Record<string, unknown>;
+  specs: Record<string, any>;
   images: string[];
 }
 
@@ -32,75 +64,49 @@ interface ProductCardProps {
   showConditionBadge?: boolean;
 }
 
-const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
-).replace(/\/+$/, '');
-
-function getImageUrl(image?: string): string {
-  if (!image?.trim()) {
-    return '/placeholder-product.jpg';
-  }
-
-  let url = image.trim();
-
-  // Repair a backend URL accidentally prefixed to an R2 URL.
-  if (url.startsWith(API_URL)) {
-    const remainder = url.slice(API_URL.length);
-
-    if (/^https?:\/\//i.test(remainder)) {
-      url = remainder;
-    }
-  }
-
-  // Preserve complete image URLs.
-  if (/^https?:\/\//i.test(url)) {
-    return url;
-  }
-
-  // Legacy images served by the backend.
-  if (url.startsWith('/uploads/')) {
-    return `${API_URL}${url}`;
-  }
-
-  if (url.startsWith('uploads/')) {
-    return `${API_URL}/${url}`;
-  }
-
-  // Frontend assets.
-  return url;
-}
-
 export function ProductCard({
   product,
-  showConditionBadge = true
+  showConditionBadge = true,
 }: ProductCardProps) {
   const { language, currency } = useApp();
 
-  const price = currency === 'EUR' ? product.priceEUR : product.priceMKD;
+  const price =
+    currency === 'EUR' ? product.priceEUR : product.priceMKD;
+
   const formattedPrice = formatPrice(price ?? 0, currency);
-  const productName = product.name[language] || product.name.en;
+  const productName =
+    product.name[language] || product.name.en || product.brand;
 
   const conditionText = getTranslation(
     language,
-    `catalog.conditions.${product.condition.replace(/\s+/g, '')}`
+    `catalog.conditions.${product.condition.replace(' ', '')}`
   );
 
   const isSold = product.status === 'sold';
   const imageUrl = getImageUrl(product.images?.[0]);
+  const productUrl = `/product/${product.slug}`;
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <Link href={`/product/${product.slug}`}>
-        <div className="relative aspect-[4/3] bg-gray-100">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
+      <Link href={productUrl} className="block">
+        <div className="relative aspect-[4/3] bg-white overflow-hidden">
           <img
             src={imageUrl}
             alt={productName}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain p-2"
+            onError={(e) => {
+              const image = e.currentTarget;
+
+              if (image.dataset.fallbackApplied === 'true') return;
+
+              image.dataset.fallbackApplied = 'true';
+              image.src = '/placeholder-product.jpg';
+            }}
           />
 
           {showConditionBadge && (
-            <div className="absolute top-2 left-2 bg-white/90 text-gray-900 px-2 py-1 rounded text-xs font-medium">
+            <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs font-medium text-gray-700">
               {conditionText}
             </div>
           )}
@@ -112,29 +118,29 @@ export function ProductCard({
                 : 'bg-green-100 text-green-800'
             }`}
           >
-            {isSold
-              ? language === 'en'
-                ? 'SOLD'
-                : 'ПРОДАДЕНО'
-              : language === 'en'
-                ? 'AVAILABLE'
-                : 'ДОСТАПНО'}
+            {isSold ? 'SOLD' : 'AVAILABLE'}
           </div>
         </div>
       </Link>
 
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-1">
         <div className="mb-2">
-          <span className="text-sm text-gray-500">{product.brand}</span>
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-            {productName}
-          </h3>
+          <span className="text-sm text-gray-500">
+            {product.brand}
+          </span>
+
+          <Link href={productUrl}>
+            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+              {productName}
+            </h3>
+          </Link>
         </div>
 
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between gap-2 mb-4">
           <span className="text-xl font-bold text-gray-900">
             {formattedPrice}
           </span>
+
           <span className="text-sm text-gray-500 capitalize">
             {getTranslation(
               language,
@@ -143,22 +149,14 @@ export function ProductCard({
           </span>
         </div>
 
-        {/* Additional image retained from your original card. */}
-        <div className="mb-3 flex justify-center">
-          <img
-            src={imageUrl}
-            alt={productName}
-            loading="lazy"
-            className="w-full h-auto object-cover rounded-lg"
-          />
-        </div>
-
         <Link
-          href={`/product/${product.slug}`}
-          className="w-full bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center space-x-2"
+          href={productUrl}
+          className="mt-auto w-full bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
         >
           <Eye className="h-4 w-4" />
-          <span>{getTranslation(language, 'common.viewDetails')}</span>
+          <span>
+            {getTranslation(language, 'common.viewDetails')}
+          </span>
         </Link>
       </div>
     </div>
