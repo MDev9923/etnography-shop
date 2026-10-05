@@ -51,11 +51,24 @@ export const translations: Record<Language, Translation> = {
         digital: 'Digital',
         both: 'Both'
       },
-      filmTypes: {
+     filmTypes: {
+        mm35: '35mm',
+        mm120: '120',
         mm35Color: '35mm Color',
         mm35BW: '35mm Black & White',
         mm120Color: '120 Color',
-        mm120BW: '120 Black & White'
+        mm120BW: '120 Black & White',
+        aps: 'APS',
+        mm110: '110',
+        mm110Color: '110 Color',
+        mm110BW: '110 Black & White',
+        polaroidSX70: 'Polaroid SX-70',
+        polaroid600: 'Polaroid 600',
+        polaroidIType: 'Polaroid i-Type',
+        instaxMini: 'Instax Mini',
+        instaxSquare: 'Instax Square',
+        instaxWide: 'Instax Wide',
+        xiaomiZink: 'Xiaomi ZINK Paper',
       },
       conditions: {
         likeNew: 'Like New',
