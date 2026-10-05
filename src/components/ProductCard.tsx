@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useApp } from '@/lib/context';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
@@ -24,7 +23,7 @@ interface Product {
     en: string;
     mk: string;
   };
-  specs: Record<string, any>;
+  specs: Record<string, unknown>;
   images: string[];
 }
 
@@ -33,32 +32,79 @@ interface ProductCardProps {
   showConditionBadge?: boolean;
 }
 
-export function ProductCard({ product, showConditionBadge = true }: ProductCardProps) {
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
+).replace(/\/+$/, '');
+
+function getImageUrl(image?: string): string {
+  if (!image?.trim()) {
+    return '/placeholder-product.jpg';
+  }
+
+  let url = image.trim();
+
+  // Repair a backend URL accidentally prefixed to an R2 URL.
+  if (url.startsWith(API_URL)) {
+    const remainder = url.slice(API_URL.length);
+
+    if (/^https?:\/\//i.test(remainder)) {
+      url = remainder;
+    }
+  }
+
+  // Preserve complete image URLs.
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  // Legacy images served by the backend.
+  if (url.startsWith('/uploads/')) {
+    return `${API_URL}${url}`;
+  }
+
+  if (url.startsWith('uploads/')) {
+    return `${API_URL}/${url}`;
+  }
+
+  // Frontend assets.
+  return url;
+}
+
+export function ProductCard({
+  product,
+  showConditionBadge = true
+}: ProductCardProps) {
   const { language, currency } = useApp();
 
   const price = currency === 'EUR' ? product.priceEUR : product.priceMKD;
-  const formattedPrice = formatPrice(price || 0, currency);
-  const productName = product.name[language];
-  const conditionText = getTranslation(language, `catalog.conditions.${product.condition.replace(' ', '')}`);
+  const formattedPrice = formatPrice(price ?? 0, currency);
+  const productName = product.name[language] || product.name.en;
+
+  const conditionText = getTranslation(
+    language,
+    `catalog.conditions.${product.condition.replace(/\s+/g, '')}`
+  );
+
   const isSold = product.status === 'sold';
+  const imageUrl = getImageUrl(product.images?.[0]);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       <Link href={`/product/${product.slug}`}>
-        <div className="relative aspect-w-16 aspect-h-12 bg-gray-100">
-          {/* Camera Image */}
-          <Image
-            src={product.images[0] || '/placeholder-product.jpg'}
+        <div className="relative aspect-[4/3] bg-gray-100">
+          <img
+            src={imageUrl}
             alt={productName}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
+            className="absolute inset-0 w-full h-full object-cover"
           />
-          {/* {showConditionBadge && (
-            <div className="absolute top-2 left-2 bg-white bg-opacity-90 px-2 py-1 rounded text-xs font-medium">
+
+          {showConditionBadge && (
+            <div className="absolute top-2 left-2 bg-white/90 text-gray-900 px-2 py-1 rounded text-xs font-medium">
               {conditionText}
             </div>
-          )} */}
+          )}
+
           <div
             className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
               isSold
@@ -66,11 +112,17 @@ export function ProductCard({ product, showConditionBadge = true }: ProductCardP
                 : 'bg-green-100 text-green-800'
             }`}
           >
-            {isSold ? 'SOLD' : 'AVAILABLE'}
+            {isSold
+              ? language === 'en'
+                ? 'SOLD'
+                : 'ПРОДАДЕНО'
+              : language === 'en'
+                ? 'AVAILABLE'
+                : 'ДОСТАПНО'}
           </div>
         </div>
       </Link>
-      
+
       <div className="p-4">
         <div className="mb-2">
           <span className="text-sm text-gray-500">{product.brand}</span>
@@ -78,25 +130,29 @@ export function ProductCard({ product, showConditionBadge = true }: ProductCardP
             {productName}
           </h3>
         </div>
-        
+
         <div className="flex items-center justify-between mb-3">
           <span className="text-xl font-bold text-gray-900">
             {formattedPrice}
           </span>
           <span className="text-sm text-gray-500 capitalize">
-            {getTranslation(language, `catalog.categories.${product.category}`)}
+            {getTranslation(
+              language,
+              `catalog.categories.${product.category}`
+            )}
           </span>
         </div>
-        
-        {/* Camera Image in Details */}
+
+        {/* Additional image retained from your original card. */}
         <div className="mb-3 flex justify-center">
-          <img 
-            src={product.images[0] || '/placeholder-product.jpg'}
-            alt="Etnography Camera"
-            className="w-144 h-144 object-cover rounded-lg opacity-100"
+          <img
+            src={imageUrl}
+            alt={productName}
+            loading="lazy"
+            className="w-full h-auto object-cover rounded-lg"
           />
         </div>
-        
+
         <Link
           href={`/product/${product.slug}`}
           className="w-full bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center space-x-2"

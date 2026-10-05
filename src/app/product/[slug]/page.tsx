@@ -1,13 +1,19 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useApp } from '@/lib/context';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
-import { ArrowLeft, ChevronLeft, ChevronRight, Instagram, Mail } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Instagram,
+  Mail
+} from 'lucide-react';
 
 type Product = {
   id: number;
@@ -22,10 +28,44 @@ type Product = {
   priceEUR: number | null;
   priceMKD: number | null;
   description: { en: string; mk: string };
-  specs: Record<string, any>;
+  specs: Record<string, unknown>;
   images: string[];
   status?: 'available' | 'sold';
 };
+
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
+).replace(/\/+$/, '');
+
+function getImageUrl(image: string): string {
+  let url = image.trim();
+
+  // Repair an API URL accidentally prefixed to a complete image URL.
+  if (url.startsWith(API_URL)) {
+    const remainder = url.slice(API_URL.length);
+
+    if (/^https?:\/\//i.test(remainder)) {
+      url = remainder;
+    }
+  }
+
+  // R2 and other complete URLs must remain unchanged.
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  // Legacy uploads are served by the backend.
+  if (url.startsWith('/uploads/')) {
+    return `${API_URL}${url}`;
+  }
+
+  if (url.startsWith('uploads/')) {
+    return `${API_URL}/${url}`;
+  }
+
+  // Frontend assets, including the placeholder.
+  return url;
+}
 
 export default function ProductPage() {
   const { language, currency } = useApp();
@@ -34,41 +74,68 @@ export default function ProductPage() {
 
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const product = allProducts.find((p) => p.slug === slug);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Fetch products from API
+  const product = allProducts.find((p) => String(p.slug) === slug);
+
   useEffect(() => {
+    let active = true;
+
     const fetchProducts = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
-        const response = await fetch(`${apiUrl}/api/products`);
+        const response = await fetch(`${API_URL}/api/products`);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.status}`);
+        }
+
         const data = await response.json();
-        setAllProducts(data);
+
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid products response');
+        }
+
+        if (active) {
+          setAllProducts(data);
+        }
       } catch (error) {
         console.error('Failed to fetch products:', error);
-        // Fallback to local JSON if API fails
-        const localProducts = (await import('@/data/products.json')).default;
-        setAllProducts(localProducts as unknown as Product[]);
+
+        try {
+          const localProducts = (await import('@/data/products.json')).default;
+
+          if (active) {
+            setAllProducts(localProducts as unknown as Product[]);
+          }
+        } catch (fallbackError) {
+          console.error('Failed to load local products:', fallbackError);
+        }
       } finally {
-        setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProducts();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [slug]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
-            <p className="text-gray-900">Loading product...</p>
-          </div>
+          <p className="text-center text-gray-900">
+            {language === 'en' ? 'Loading product...' : 'Се вчитува производот...'}
+          </p>
         </div>
         <Footer />
       </div>
@@ -82,7 +149,9 @@ export default function ProductPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              {language === 'en' ? 'Product Not Found' : 'Производот не е пронајден'}
+              {language === 'en'
+                ? 'Product Not Found'
+                : 'Производот не е пронајден'}
             </h1>
             <p className="text-gray-600">
               {language === 'en'
@@ -99,72 +168,86 @@ export default function ProductPage() {
   const isSold = product.status === 'sold';
   const price = currency === 'EUR' ? product.priceEUR : product.priceMKD;
   const formattedPrice = formatPrice(price ?? 0, currency);
-  const productName = product.name[language];
-  const description = product.description[language];
+  const productName = product.name[language] || product.name.en;
+  const description =
+    product.description?.[language] || product.description?.en || '';
 
   const conditionText = getTranslation(
     language,
     `catalog.conditions.${product.condition.replace(/\s+/g, '')}`
   );
-  const categoryText = getTranslation(language, `catalog.categories.${product.category}`);
-  const typeText = getTranslation(language, `catalog.types.${product.filmDigital}`);
 
-  const images = product.images?.length ? product.images : ['/placeholder-product.jpg'];
+  const categoryText = getTranslation(
+    language,
+    `catalog.categories.${product.category}`
+  );
+
+  const typeText = product.filmDigital
+    ? getTranslation(language, `catalog.types.${product.filmDigital}`)
+    : '';
+
+  const validImages = (product.images || []).filter(
+    (image) => typeof image === 'string' && image.trim().length > 0
+  );
+
+  const images = validImages.length
+    ? validImages.map(getImageUrl)
+    : ['/placeholder-product.jpg'];
+
   const safeIndex = Math.min(currentImageIndex, images.length - 1);
   const currentImage = images[safeIndex];
 
-  const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  const nextImage = () => {
+    setCurrentImageIndex((previous) => (previous + 1) % images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex(
+      (previous) => (previous - 1 + images.length) % images.length
+    );
+  };
 
   const handleInstagramDM = () => {
-    const url = 'https://ig.me/m/_etnography';
-    if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(
+      'https://ig.me/m/_etnography',
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   const handleEmailOrder = () => {
-    const name = product?.name?.[language] ?? product?.name?.en ?? 'Product';
-    const brand = product?.brand ?? '';
-    const subject = encodeURIComponent(`Order Inquiry - ${name}`);
+    const subject = encodeURIComponent(`Order Inquiry - ${productName}`);
 
     const body = encodeURIComponent(
       [
         language === 'en' ? 'Hello,' : 'Здраво,',
         '',
         language === 'en'
-          ? `I'm interested in purchasing: ${name}${brand ? ` (${brand})` : ''}`
-          : `Заинтересиран сум за купување: ${name}${brand ? ` (${brand})` : ''}`,
-        `Product ID: ${product?.id ?? ''}`,
+          ? `I'm interested in purchasing: ${productName}${
+              product.brand ? ` (${product.brand})` : ''
+            }`
+          : `Заинтересиран сум за купување: ${productName}${
+              product.brand ? ` (${product.brand})` : ''
+            }`,
+        `Product ID: ${product.id}`,
         '',
         language === 'en'
           ? 'Please let me know about availability and payment options.'
-          : 'Ве молам известете ме за достапност и детали за плаќање.',
-      ].filter(Boolean).join('\n')
+          : 'Ве молам известете ме за достапност и детали за плаќање.'
+      ].join('\n')
     );
 
-    const mailtoUrl = `mailto:etnography35mk@gmail.com?subject=${subject}&body=${body}`;
-
-    if (typeof window !== 'undefined') {
-      try {
-        window.open(mailtoUrl, '_blank', 'noopener,noreferrer');
-      } catch (e) {
-        console.error('Email order failed:', e);
-        alert(
-          language === 'en'
-            ? 'Failed to open email client. Please copy the email address: etnography35mk@gmail.com'
-            : 'Не успе да се отвори е-пошта клиент. Копирајте го адресот: etnography35mk@gmail.com'
-        );
-      }
-    }
+    window.location.href =
+      `mailto:etnography35mk@gmail.com?subject=${subject}&body=${body}`;
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      {/* ✅ Background Music: has a real src and will try autoplay on mount */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back Button */}
         <button
+          type="button"
           onClick={() => window.history.back()}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-8"
         >
@@ -173,11 +256,11 @@ export default function ProductPage() {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Image Gallery */}
+          {/* Image gallery */}
           <div className="space-y-4">
             <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
               <img
-                src={currentImage || '/placeholder-product.jpg'}
+                src={currentImage}
                 alt={productName}
                 className="w-full h-full object-cover"
               />
@@ -185,6 +268,7 @@ export default function ProductPage() {
               {images.length > 1 && (
                 <>
                   <button
+                    type="button"
                     onClick={prevImage}
                     className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-all"
                     aria-label="Previous image"
@@ -193,6 +277,7 @@ export default function ProductPage() {
                   </button>
 
                   <button
+                    type="button"
                     onClick={nextImage}
                     className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-all"
                     aria-label="Next image"
@@ -207,6 +292,7 @@ export default function ProductPage() {
               <div className="flex space-x-2 overflow-x-auto">
                 {images.map((image, index) => (
                   <button
+                    type="button"
                     key={`${image}-${index}`}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
@@ -227,21 +313,30 @@ export default function ProductPage() {
             )}
           </div>
 
-          {/* Product Info */}
+          {/* Product information */}
           <div className="space-y-6">
             <div>
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-2">
                 <span className="text-sm text-gray-500">{product.brand}</span>
                 <span className="text-gray-300">•</span>
                 <span className="text-sm text-gray-500">{categoryText}</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-sm text-gray-500">{typeText}</span>
+
+                {typeText && (
+                  <>
+                    <span className="text-gray-300">•</span>
+                    <span className="text-sm text-gray-500">{typeText}</span>
+                  </>
+                )}
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">{productName}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                {productName}
+              </h1>
 
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-3xl font-bold text-gray-900">{formattedPrice}</span>
+              <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+                <span className="text-3xl font-bold text-gray-900">
+                  {formattedPrice}
+                </span>
 
                 <div className="flex items-center gap-2">
                   <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -250,7 +345,9 @@ export default function ProductPage() {
 
                   <span
                     className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      isSold ? 'bg-red-600 text-white' : 'bg-emerald-100 text-emerald-800'
+                      isSold
+                        ? 'bg-red-600 text-white'
+                        : 'bg-emerald-100 text-emerald-800'
                     }`}
                   >
                     {isSold
@@ -304,7 +401,8 @@ export default function ProductPage() {
 
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={isSold ? undefined : handleInstagramDM}
+                type="button"
+                onClick={handleInstagramDM}
                 disabled={isSold}
                 className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
                   isSold
@@ -325,15 +423,17 @@ export default function ProductPage() {
               </button>
 
               <button
+                type="button"
                 onClick={handleEmailOrder}
                 className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center space-x-2"
               >
                 <Mail className="h-5 w-5" />
-                <span>{language === 'en' ? 'Email for Order' : 'Е-пошта за Нарачка'}</span>
+                <span>
+                  {language === 'en' ? 'Email for Order' : 'Е-пошта за Нарачка'}
+                </span>
               </button>
             </div>
 
-            {/* Additional Info */}
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-start space-x-3">
                 <Instagram className="h-5 w-5 text-primary mt-0.5" />
@@ -342,11 +442,10 @@ export default function ProductPage() {
                     {language === 'en' ? 'How to Purchase' : 'Како да купите'}
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                {language === 'en'
-                      ? 'Click the "DM to Buy" button to contact us via Instagram (@_etnography) with your inquiry. Our team will respond promptly with availability and payment details.'
-                  : 'Кликнете на "Порака за Купување" за да не контактирате преку Instagram (@_etnography) со вашето прашање. Нашиот тим ќе одговори брзо со информации за достапност и детали за плаќање.'
-}
-              </p>
+                    {language === 'en'
+                      ? 'Click "DM for Info" to contact us via Instagram (@_etnography). We will respond with availability and payment details.'
+                      : 'Кликнете на „Порака за Информации“ за да нè контактирате преку Instagram (@_etnography). Ќе одговориме со информации за достапност и детали за плаќање.'}
+                  </p>
                 </div>
               </div>
             </div>

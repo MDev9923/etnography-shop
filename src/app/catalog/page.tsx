@@ -57,6 +57,9 @@ export default function CatalogPage() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
         const response = await fetch(`${apiUrl}/api/products`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
         const data = await response.json();
         setAllProducts(data);
       } catch (error) {
