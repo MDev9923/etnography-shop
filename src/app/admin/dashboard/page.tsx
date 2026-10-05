@@ -718,7 +718,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
                     }}
                     className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
                   >
-                    Cancel
+                    <p style={{ color: 'black' }}>Cancel</p>
                   </button>
                   <button
                     type="submit"
