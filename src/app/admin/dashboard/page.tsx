@@ -103,9 +103,11 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
 
       const data = await response.json();
       if (response.ok) {
+        // Combine API URL with the relative path
+        const fullUrl = `${apiUrl}${data.url}`;
         setFormData(prev => ({
           ...prev,
-          images: [...prev.images, data.url]
+          images: [...prev.images, fullUrl]
         }));
       }
     } catch (error) {
