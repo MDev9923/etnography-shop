@@ -277,14 +277,8 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Debug Info */}
-        <div className="mb-4 p-4 bg-gray-100 rounded text-sm">
-          <p><strong>Debug:</strong></p>
-          <p>Loading: {loading.toString()}</p>
-          <p>Total Products: {products.length}</p>
-          <p>Filtered Products: {filteredProducts.length}</p>
-          <p>Show Sold: {showSold.toString()}</p>
-          <p>Search Term: "{searchTerm}"</p>
+=        <div className="mb-4 p-4 bg-gray-100 rounded text-sm">
+          <p style={{ color: 'black' }}><strong>Total Products:</strong> {products.length}</p>
         </div>
 
         {/* Actions */}
