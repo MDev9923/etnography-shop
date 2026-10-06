@@ -40,7 +40,7 @@ const API_URL = (
 function getImageUrl(image: string): string {
   let url = image.trim();
 
-  // Repair an API URL accidentally prefixed to a complete image URL.
+  // Repair a backend URL accidentally prefixed to a complete image URL.
   if (url.startsWith(API_URL)) {
     const remainder = url.slice(API_URL.length);
 
@@ -49,12 +49,10 @@ function getImageUrl(image: string): string {
     }
   }
 
-  // R2 and other complete URLs must remain unchanged.
   if (/^https?:\/\//i.test(url)) {
     return url;
   }
 
-  // Legacy uploads are served by the backend.
   if (url.startsWith('/uploads/')) {
     return `${API_URL}${url}`;
   }
@@ -63,7 +61,6 @@ function getImageUrl(image: string): string {
     return `${API_URL}/${url}`;
   }
 
-  // Frontend assets, including the placeholder.
   return url;
 }
 
@@ -76,12 +73,12 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const product = allProducts.find((p) => String(p.slug) === slug);
+  const product = allProducts.find((item) => String(item.slug) === slug);
 
   useEffect(() => {
     let active = true;
 
-    const fetchProducts = async () => {
+    async function fetchProducts() {
       try {
         const response = await fetch(`${API_URL}/api/products`);
 
@@ -115,9 +112,9 @@ export default function ProductPage() {
           setLoading(false);
         }
       }
-    };
+    }
 
-    fetchProducts();
+    void fetchProducts();
 
     return () => {
       active = false;
@@ -132,11 +129,15 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <p className="text-center text-gray-900">
-            {language === 'en' ? 'Loading product...' : 'Се вчитува производот...'}
+            {language === 'en'
+              ? 'Loading product...'
+              : 'Се вчитува производот...'}
           </p>
-        </div>
+        </main>
+
         <Footer />
       </div>
     );
@@ -146,20 +147,23 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               {language === 'en'
                 ? 'Product Not Found'
                 : 'Производот не е пронајден'}
             </h1>
+
             <p className="text-gray-600">
               {language === 'en'
                 ? 'The product you are looking for does not exist.'
                 : 'Производот што го барате не постои.'}
             </p>
           </div>
-        </div>
+        </main>
+
         <Footer />
       </div>
     );
@@ -168,6 +172,7 @@ export default function ProductPage() {
   const isSold = product.status === 'sold';
   const price = currency === 'EUR' ? product.priceEUR : product.priceMKD;
   const formattedPrice = formatPrice(price ?? 0, currency);
+
   const productName = product.name[language] || product.name.en;
   const description =
     product.description?.[language] || product.description?.en || '';
@@ -230,6 +235,7 @@ export default function ProductPage() {
               product.brand ? ` (${product.brand})` : ''
             }`,
         `Product ID: ${product.id}`,
+        `URL: ${window.location.href}`,
         '',
         language === 'en'
           ? 'Please let me know about availability and payment options.'
@@ -237,8 +243,13 @@ export default function ProductPage() {
       ].join('\n')
     );
 
-    window.location.href =
-      `mailto:etnography35mk@gmail.com?subject=${subject}&body=${body}`;
+    const gmailUrl =
+      'https://mail.google.com/mail/?view=cm&fs=1' +
+      '&to=etnography35mk%40gmail.com' +
+      `&su=${subject}` +
+      `&body=${body}`;
+
+    window.open(gmailUrl, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -249,7 +260,7 @@ export default function ProductPage() {
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-8"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8"
         >
           <ArrowLeft className="h-5 w-5" />
           <span>{getTranslation(language, 'common.back')}</span>
@@ -257,12 +268,12 @@ export default function ProductPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image gallery */}
-          <div className="space-y-4">
-            <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+          <div className="min-w-0 space-y-4">
+            <div className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden">
               <img
                 src={currentImage}
                 alt={productName}
-                className="w-full h-full object-cover"
+                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8"
               />
 
               {images.length > 1 && (
@@ -270,8 +281,10 @@ export default function ProductPage() {
                   <button
                     type="button"
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-all"
-                    aria-label="Previous image"
+                    className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
+                    aria-label={
+                      language === 'en' ? 'Previous image' : 'Претходна слика'
+                    }
                   >
                     <ChevronLeft className="h-6 w-6 text-gray-800" />
                   </button>
@@ -279,8 +292,10 @@ export default function ProductPage() {
                   <button
                     type="button"
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full hover:bg-white transition-all"
-                    aria-label="Next image"
+                    className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
+                    aria-label={
+                      language === 'en' ? 'Next image' : 'Следна слика'
+                    }
                   >
                     <ChevronRight className="h-6 w-6 text-gray-800" />
                   </button>
@@ -289,23 +304,28 @@ export default function ProductPage() {
             </div>
 
             {images.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto">
+              <div className="flex gap-2 overflow-x-auto pb-2">
                 {images.map((image, index) => (
                   <button
                     type="button"
                     key={`${image}-${index}`}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`flex-shrink-0 w-20 h-20 bg-white rounded-lg overflow-hidden border-2 transition-all ${
                       index === safeIndex
                         ? 'border-blue-500 opacity-100'
                         : 'border-gray-200 opacity-70 hover:opacity-100'
                     }`}
-                    aria-label={`View image ${index + 1}`}
+                    aria-label={
+                      language === 'en'
+                        ? `View image ${index + 1}`
+                        : `Прикажи слика ${index + 1}`
+                    }
+                    aria-pressed={index === safeIndex}
                   >
                     <img
                       src={image}
                       alt={`${productName} ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="block w-full h-full object-contain p-2"
                     />
                   </button>
                 ))}
@@ -314,17 +334,25 @@ export default function ProductPage() {
           </div>
 
           {/* Product information */}
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             <div>
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-2">
-                <span className="text-sm text-gray-500">{product.brand}</span>
+                <span className="text-sm text-gray-500">
+                  {product.brand}
+                </span>
+
                 <span className="text-gray-300">•</span>
-                <span className="text-sm text-gray-500">{categoryText}</span>
+
+                <span className="text-sm text-gray-500">
+                  {categoryText}
+                </span>
 
                 {typeText && (
                   <>
                     <span className="text-gray-300">•</span>
-                    <span className="text-sm text-gray-500">{typeText}</span>
+                    <span className="text-sm text-gray-500">
+                      {typeText}
+                    </span>
                   </>
                 )}
               </div>
@@ -366,7 +394,10 @@ export default function ProductPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {getTranslation(language, 'product.description')}
               </h3>
-              <p className="text-gray-600 leading-relaxed">{description}</p>
+
+              <p className="text-gray-600 leading-relaxed">
+                {description}
+              </p>
             </div>
 
             <div>
@@ -381,6 +412,7 @@ export default function ProductPage() {
                       <dt className="text-sm font-medium text-gray-500 capitalize">
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </dt>
+
                       <dd className="text-sm text-gray-900 font-medium text-right">
                         {String(value)}
                       </dd>
@@ -391,6 +423,7 @@ export default function ProductPage() {
                     <dt className="text-sm font-medium text-gray-500">
                       {getTranslation(language, 'product.condition')}
                     </dt>
+
                     <dd className="text-sm text-gray-900 font-medium text-right">
                       {conditionText}
                     </dd>
@@ -404,13 +437,14 @@ export default function ProductPage() {
                 type="button"
                 onClick={handleInstagramDM}
                 disabled={isSold}
-                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
+                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
                   isSold
                     ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                     : 'bg-gradient-to-r from-primary to-accent text-primary-foreground hover:from-accent hover:to-primary'
                 }`}
               >
                 <Instagram className="h-5 w-5" />
+
                 <span>
                   {isSold
                     ? language === 'en'
@@ -425,26 +459,33 @@ export default function ProductPage() {
               <button
                 type="button"
                 onClick={handleEmailOrder}
-                className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center space-x-2"
+                className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
               >
                 <Mail className="h-5 w-5" />
+
                 <span>
-                  {language === 'en' ? 'Email for Order' : 'Е-пошта за Нарачка'}
+                  {language === 'en'
+                    ? 'Email for Order'
+                    : 'Е-пошта за Нарачка'}
                 </span>
               </button>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-4">
-              <div className="flex items-start space-x-3">
-                <Instagram className="h-5 w-5 text-primary mt-0.5" />
+              <div className="flex items-start gap-3">
+                <Instagram className="h-5 w-5 flex-shrink-0 text-primary mt-0.5" />
+
                 <div>
                   <h4 className="text-sm font-semibold text-foreground mb-1">
-                    {language === 'en' ? 'How to Purchase' : 'Како да купите'}
+                    {language === 'en'
+                      ? 'How to Purchase'
+                      : 'Како да купите'}
                   </h4>
+
                   <p className="text-sm text-muted-foreground">
                     {language === 'en'
-                      ? 'Click "DM for Info" to contact us via Instagram (@_etnography). We will respond with availability and payment details.'
-                      : 'Кликнете на „Порака за Информации“ за да нè контактирате преку Instagram (@_etnography). Ќе одговориме со информации за достапност и детали за плаќање.'}
+                      ? 'Contact us via Instagram (@_etnography), or click “Email for Order” to open a prepared message in Gmail. We will respond with availability and payment details.'
+                      : 'Контактирајте нè преку Instagram (@_etnography), или кликнете на „Е-пошта за Нарачка“ за да отворите подготвена порака во Gmail. Ќе одговориме со информации за достапност и детали за плаќање.'}
                   </p>
                 </div>
               </div>
