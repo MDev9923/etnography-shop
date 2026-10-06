@@ -3,7 +3,7 @@ import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 import { getTranslation } from '@/lib/i18n';
 import { Language } from '@/lib/i18n';
-import products from '@/data/products.json';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Home } from 'lucide-react';
 
@@ -31,8 +31,6 @@ type Product = {
   status?: 'available' | 'sold';
 };
 
-const allProducts = products as unknown as Product[];
-
 // Inline hook to bypass import issues
 function useApp() {
   return {
@@ -45,9 +43,35 @@ function useApp() {
 
 export default function HomePage() {
   const { language } = useApp();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Get featured products (newest 6 products)
-  const featuredProducts = [...allProducts]
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003';
+        const response = await fetch(`${apiUrl}/api/products`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        // Fallback to local JSON if API fails
+        const localProducts = (await import('@/data/products.json')).default;
+        setProducts(localProducts as unknown as Product[]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Get featured products (newest 6 available products)
+  const featuredProducts = [...products]
     .filter((p) => p.status !== 'sold')
     .sort((a, b) => b.id - a.id)
     .slice(0, 6);

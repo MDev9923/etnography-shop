@@ -57,6 +57,17 @@ interface Product {
   description_en?: string;
   description_mk?: string;
   specs?: Record<string, unknown>;
+  // New sold fields
+  selling_price_eur?: number | null;
+  selling_price_mkd?: number | null;
+  sold_date?: string | null;
+  purchase_amount_eur?: number | null;
+  purchase_amount_mkd?: number | null;
+  purchased_by?: string | null;
+  purchased_by_note?: string | null;
+  general_note?: string | null;
+  visible_in_catalog?: number;
+}
 }
 
 interface ProductForm {
@@ -75,6 +86,16 @@ interface ProductForm {
   description_en: string;
   description_mk: string;
   images: string[];
+  // New sold fields
+  selling_price_eur: string;
+  selling_price_mkd: string;
+  sold_date: string;
+  purchase_amount_eur: string;
+  purchase_amount_mkd: string;
+  purchased_by: string;
+  purchased_by_note: string;
+  general_note: string;
+  visible_in_catalog: boolean;
 }
 
 function createEmptyForm(): ProductForm {
@@ -94,6 +115,15 @@ function createEmptyForm(): ProductForm {
     description_en: '',
     description_mk: '',
     images: [],
+    selling_price_eur: '',
+    selling_price_mkd: '',
+    sold_date: '',
+    purchase_amount_eur: '',
+    purchase_amount_mkd: '',
+    purchased_by: '',
+    purchased_by_note: '',
+    general_note: '',
+    visible_in_catalog: true
   };
 }
 
@@ -163,13 +193,19 @@ export default function AdminDashboard() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<ProductForm>(createEmptyForm);
+  const [activeTab, setActiveTab] = useState<'all' | 'sold'>('all');
+  const [financialSummary, setFinancialSummary] = useState<any>(null);
 
   const fetchProducts = useCallback(async () => {
     try {
       setError('');
 
-      const response = await fetch(`${API_URL}/api/products`, {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch(`${API_URL}/api/admin/products`, {
         cache: 'no-store',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
@@ -376,6 +412,15 @@ export default function AdminDashboard() {
       description_mk:
         product.description?.mk ?? product.description_mk ?? '',
       images: (product.images || []).map(getImageUrl),
+      selling_price_eur: product.selling_price_eur == null ? '' : String(product.selling_price_eur),
+      selling_price_mkd: product.selling_price_mkd == null ? '' : String(product.selling_price_mkd),
+      sold_date: product.sold_date || '',
+      purchase_amount_eur: product.purchase_amount_eur == null ? '' : String(product.purchase_amount_eur),
+      purchase_amount_mkd: product.purchase_amount_mkd == null ? '' : String(product.purchase_amount_mkd),
+      purchased_by: product.purchased_by || '',
+      purchased_by_note: product.purchased_by_note || '',
+      general_note: product.general_note || '',
+      visible_in_catalog: product.visible_in_catalog === 1
     });
 
     setShowModal(true);
