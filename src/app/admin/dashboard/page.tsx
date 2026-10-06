@@ -57,7 +57,8 @@ interface Product {
   description_en?: string;
   description_mk?: string;
   specs?: Record<string, unknown>;
-  // New sold fields
+
+  // Sold and purchase fields
   selling_price_eur?: number | null;
   selling_price_mkd?: number | null;
   sold_date?: string | null;
@@ -67,7 +68,6 @@ interface Product {
   purchased_by_note?: string | null;
   general_note?: string | null;
   visible_in_catalog?: number;
-}
 }
 
 interface ProductForm {
