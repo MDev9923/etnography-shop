@@ -196,6 +196,26 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<'all' | 'sold'>('all');
   const [financialSummary, setFinancialSummary] = useState<any>(null);
 
+  const fetchFinancialSummary = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await fetch(`${API_URL}/api/admin/financial-summary`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load financial summary');
+      }
+
+      const data = await response.json();
+      setFinancialSummary(data);
+    } catch (err) {
+      console.error('Failed to fetch financial summary:', err);
+    }
+  }, []);
+
   const fetchProducts = useCallback(async () => {
     try {
       setError('');
@@ -238,6 +258,12 @@ export default function AdminDashboard() {
 
     void fetchProducts();
   }, [router, fetchProducts]);
+
+  useEffect(() => {
+    if (activeTab === 'sold') {
+      void fetchFinancialSummary();
+    }
+  }, [activeTab, fetchFinancialSummary]);
 
   function resetForm() {
     setEditingProduct(null);
@@ -355,6 +381,16 @@ export default function AdminDashboard() {
         },
         specs: editingProduct?.specs || {},
         images: formData.images.map(getImageUrl),
+        // Sold fields
+        sellingPriceEUR: formData.selling_price_eur === '' ? null : Number(formData.selling_price_eur),
+        sellingPriceMKD: formData.selling_price_mkd === '' ? null : Number(formData.selling_price_mkd),
+        soldDate: formData.sold_date || null,
+        purchaseAmountEUR: formData.purchase_amount_eur === '' ? null : Number(formData.purchase_amount_eur),
+        purchaseAmountMKD: formData.purchase_amount_mkd === '' ? null : Number(formData.purchase_amount_mkd),
+        purchasedBy: formData.purchased_by || null,
+        purchasedByNote: formData.purchased_by_note || null,
+        generalNote: formData.general_note || null,
+        visibleInCatalog: formData.visible_in_catalog
       };
 
       const url = editingProduct
@@ -499,17 +535,114 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-            {error}
-            <button
-              onClick={() => void fetchProducts()}
-              className="ml-3 underline"
-            >
-              Retry
-            </button>
+        {/* Tab Switcher */}
+        <div className="flex gap-4 mb-6">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              activeTab === 'all'
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            All Products
+          </button>
+          <button
+            onClick={() => setActiveTab('sold')}
+            className={`px-4 py-2 rounded-lg font-medium ${
+              activeTab === 'sold'
+                ? 'bg-gray-900 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Sold Products
+          </button>
+        </div>
+
+        {/* Sold Tab */}
+        {activeTab === 'sold' && (
+          <div className="space-y-6">
+            {financialSummary ? (
+              <>
+                <div className="bg-white rounded-lg shadow p-6">
+                  <h2 className="text-xl font-bold mb-4">Financial Summary</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Total Purchase Cost</p>
+                      <p className="text-lg font-bold">€{financialSummary.summary.totalPurchaseCostEUR.toFixed(2)}</p>
+                    </div>
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Total Sales Revenue</p>
+                      <p className="text-lg font-bold">€{financialSummary.summary.totalSalesRevenueEUR.toFixed(2)}</p>
+                    </div>
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Total Profit</p>
+                      <p className="text-lg font-bold">€{financialSummary.summary.totalProfitEUR.toFixed(2)}</p>
+                    </div>
+                    <div className="bg-orange-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Matej Total</p>
+                      <p className="text-lg font-bold">€{financialSummary.summary.matejTotalEUR.toFixed(2)}</p>
+                    </div>
+                    <div className="bg-orange-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Gogo Total</p>
+                      <p className="text-lg font-bold">€{financialSummary.summary.gogoTotalEUR.toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                      <thead className="bg-gray-100 text-gray-600">
+                        <tr>
+                          <th className="px-4 py-3">Product</th>
+                          <th className="px-4 py-3">Selling Price</th>
+                          <th className="px-4 py-3">Purchase Amount</th>
+                          <th className="px-4 py-3">Purchased By</th>
+                          <th className="px-4 py-3">Profit</th>
+                          <th className="px-4 py-3">Matej</th>
+                          <th className="px-4 py-3">Gogo</th>
+                          <th className="px-4 py-3">Sold Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {financialSummary.products.map((product: any) => (
+                          <tr key={product.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 font-medium">{product.name}</td>
+                            <td className="px-4 py-3">€{product.sellingPriceEUR?.toFixed(2) || '-'}</td>
+                            <td className="px-4 py-3">€{product.purchaseAmountEUR?.toFixed(2) || '-'}</td>
+                            <td className="px-4 py-3">{product.purchasedBy || '-'}</td>
+                            <td className="px-4 py-3 text-green-600 font-medium">€{product.profitEUR?.toFixed(2) || '-'}</td>
+                            <td className="px-4 py-3">€{product.matejEUR?.toFixed(2) || '-'}</td>
+                            <td className="px-4 py-3">€{product.gogoEUR?.toFixed(2) || '-'}</td>
+                            <td className="px-4 py-3 text-sm">{product.soldDate ? new Date(product.soldDate).toLocaleDateString() : '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8 text-gray-500">Loading financial data...</div>
+            )}
           </div>
         )}
+
+        {/* All Products Tab */}
+        {activeTab === 'all' && (
+          <>
+            {error && (
+              <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+                {error}
+                <button
+                  onClick={() => void fetchProducts()}
+                  className="ml-3 underline"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
 
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <p className="text-gray-500">Total Products</p>
@@ -652,6 +785,8 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+          </>
+        )}
       </main>
 
       {showModal && (
@@ -981,6 +1116,180 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Sold/Purchase Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4">Sold & Purchase Details</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Visible in Catalog
+                    <select
+                      value={formData.visible_in_catalog ? 'true' : 'false'}
+                      onChange={(e) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          visible_in_catalog: e.target.value === 'true',
+                        }))
+                      }
+                      className={`${inputClass} mt-1`}
+                    >
+                      <option value="true">Show in catalog</option>
+                      <option value="false">Stay hidden</option>
+                    </select>
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700">
+                    Purchased By
+                    <select
+                      value={formData.purchased_by}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === 'Drugo') {
+                          const note = prompt('Забелешка (Note):');
+                          setFormData((previous) => ({
+                            ...previous,
+                            purchased_by: value,
+                            purchased_by_note: note || '',
+                          }));
+                        } else {
+                          setFormData((previous) => ({
+                            ...previous,
+                            purchased_by: value,
+                            purchased_by_note: '',
+                          }));
+                        }
+                      }}
+                      className={`${inputClass} mt-1`}
+                    >
+                      <option value="">Select...</option>
+                      <option value="Matej">Matej</option>
+                      <option value="Gogo">Gogo</option>
+                      <option value="Drugo">Drugo</option>
+                    </select>
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700">
+                    Purchase Amount (EUR)
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.purchase_amount_eur}
+                      onChange={(e) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          purchase_amount_eur: e.target.value,
+                          purchase_amount_mkd:
+                            e.target.value === ''
+                              ? ''
+                              : (Number(e.target.value) * 62).toFixed(0),
+                        }))
+                      }
+                      className={`${inputClass} mt-1`}
+                    />
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700">
+                    Purchase Amount (MKD)
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={formData.purchase_amount_mkd}
+                      onChange={(e) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          purchase_amount_mkd: e.target.value,
+                          purchase_amount_eur:
+                            e.target.value === ''
+                              ? ''
+                              : (Number(e.target.value) / 62).toFixed(2),
+                        }))
+                      }
+                      className={`${inputClass} mt-1`}
+                    />
+                  </label>
+
+                  {formData.status === 'sold' && (
+                    <>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Selling Price (EUR)
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={formData.selling_price_eur}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              selling_price_eur: e.target.value,
+                              selling_price_mkd:
+                                e.target.value === ''
+                                  ? ''
+                                  : (Number(e.target.value) * 62).toFixed(0),
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                          required
+                        />
+                      </label>
+
+                      <label className="block text-sm font-medium text-gray-700">
+                        Selling Price (MKD)
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={formData.selling_price_mkd}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              selling_price_mkd: e.target.value,
+                              selling_price_eur:
+                                e.target.value === ''
+                                  ? ''
+                                  : (Number(e.target.value) / 62).toFixed(2),
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                        />
+                      </label>
+
+                      <label className="block text-sm font-medium text-gray-700 md:col-span-2">
+                        Sold Date
+                        <input
+                          type="date"
+                          value={formData.sold_date}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              sold_date: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                        />
+                      </label>
+                    </>
+                  )}
+
+                  <label className="block text-sm font-medium text-gray-700 md:col-span-2">
+                    General Note / Забелешка
+                    <textarea
+                      rows={2}
+                      value={formData.general_note}
+                      onChange={(e) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          general_note: e.target.value,
+                        }))
+                      }
+                      className={`${inputClass} mt-1`}
+                      placeholder="Additional notes about this product..."
+                    />
+                  </label>
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-4">

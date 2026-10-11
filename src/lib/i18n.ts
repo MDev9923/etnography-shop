@@ -241,8 +241,8 @@ export const translations: Record<Language, Translation> = {
       qualityAssuranceText: 'Секој предмет во нашата инвентура поминува низ строги тестови и инспекции за да се осигура дека ги исполнува нашите високи стандарди за квалитет и перформанс.',
       ourStory: 'Нашата Приказна',
       storyPart1: 'Основана во 2008 година, Etnography започна како мал проект од група љубители на фотографија кои сакаа да го направат квалитетното фото опрема достапно за сите во Македонија.',
-      storyPart2: 'Over the years, we\'ve grown from a small local shop to a trusted destination for photographers across the region, known for our carefully curated selection, expert advice, and exceptional customer service.',
-      storyPart3: 'Today, we continue to serve both professional photographers and hobbyists, offering everything from vintage film cameras to the latest digital equipment, all backed by our commitment to quality and customer satisfaction.',
+      storyPart2: 'Низ годините, пораснавме од мала локална продавница до доверливо одредиште за фотографи низ регионот, познати по нашиот внимателно куриран избор, експертски совет и исклучителна клиентска услуга.',
+      storyPart3: 'Денес, продолжуваме да им служиме на професионални фотографи и хобисти, нудејќи сè од винтирж филм фотоапарати до најновата дигитална опрема, сите поддржани од нашата посветеност кон квалитет и задоволство на клиентите.',
       yearsExperience: 'Години Искуство',
       happyCustomers: 'Задоволни Клиенти',
       productsSold: 'Продадени Производи',
@@ -259,7 +259,14 @@ export const translations: Record<Language, Translation> = {
       phone: 'Телефон',
       emailLabel: 'Е-пошта',
       address: 'Адреса',
-      hours: 'Работно Време'
+      hours: 'Работно Време',
+      // Additional fields that might be on the contact page
+      sendMessage: 'Испрати Порака',
+      yourName: 'Вашето Име',
+      yourEmail: 'Вашата Е-пошта',
+      yourMessage: 'Вашата Порака',
+      followUs: 'Следете не',
+      socialMedia: 'Социјални Мрежи'
     },
     footer: {
       quickLinks: 'Брзи Врски',
