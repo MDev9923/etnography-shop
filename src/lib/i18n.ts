@@ -1,10 +1,8 @@
 export type Language = 'en' | 'mk';
 export type Currency = 'EUR' | 'MKD';
-
 export interface Translation {
   [key: string]: string | Translation;
 }
-
 export const translations: Record<Language, Translation> = {
   en: {
     nav: {
@@ -93,13 +91,13 @@ export const translations: Record<Language, Translation> = {
       mission: 'Our Mission',
       missionText: 'To make quality photography equipment accessible to everyone while preserving the art and craft of photography.',
       expertise: 'Our Expertise',
-      expertiseText: 'With over 15 years of experience in photography equipment, we carefully curate each item in our collection.',
+      expertiseText: "With around ten years of experience in photography, we carefully select each item in our collection.",
       qualityAssurance: 'Quality Assurance',
       qualityAssuranceText: 'Every item in our inventory undergoes rigorous testing and inspection to ensure it meets our high standards of quality and performance.',
       ourStory: 'Our Story',
-      storyPart1: 'Founded in 2008, Etnography began as a small passion project by a group of photography enthusiasts who wanted to make quality camera equipment accessible to everyone in Macedonia.',
-      storyPart2: 'Over the years, we\'ve grown from a small local shop to a trusted destination for photographers across the region, known for our carefully curated selection, expert advice, and exceptional customer service.',
-      storyPart3: 'Today, we continue to serve both professional photographers and hobbyists, offering everything from vintage film cameras to the latest digital equipment, all backed by our commitment to quality and customer satisfaction.',
+      storyPart1: "Etnography officially began in 2024, but our love for photography goes back around ten years. From taking our first photographs to exploring different cameras and techniques, that passion gradually grew into a desire to share our experience with others.",
+      storyPart2: "That is how Etnography came to life — a place for photography enthusiasts, offering a carefully selected range of film and digital cameras and photographic equipment. We believe every camera has a story, and the right equipment can open up new creative possibilities.",
+      storyPart3: "Whether you are looking for your first camera or the next addition to your collection, we want to help you find something that suits your style, needs, and budget.",
       yearsExperience: 'Years Experience',
       happyCustomers: 'Happy Customers',
       productsSold: 'Products Sold',
@@ -171,8 +169,8 @@ export const translations: Record<Language, Translation> = {
     },
     home: {
       title: 'Etnography - Професионална фотографска опрема',
-      subtitle: 'Откријте премиум аналогни и дигитални фотоапарати, објективи и додатоци за професионални и аматерски фотографи.',
-      featured: 'Проминирани производи',
+      subtitle: 'Откријте премиум аналогни и дигитални фотоапарати, објективи и додатоци за професионални и аматерски корисници.',
+      featured: 'Најнови производи',
       viewAll: 'Види сите производи',
       shopNow: 'Купи сега'
     },
@@ -236,13 +234,13 @@ export const translations: Record<Language, Translation> = {
       mission: 'Наша Мисија',
       missionText: 'Да направиме квалитетна фотографска опрема достапна за сите додека го зачувуваме уметноста и занаетот на фотографијата.',
       expertise: 'Нашето Знаење',
-      expertiseText: 'Со над 15 години искуство во фотографска опрема, внимателно курираме секој предмет во нашата колекција.',
+      expertiseText: "Со околу десет години искуство во фотографијата, внимателно го избираме секој производ во нашата колекција.",
       qualityAssurance: 'Гаранција на Квалитет',
       qualityAssuranceText: 'Секој предмет во нашата инвентура поминува низ строги тестови и инспекции за да се осигура дека ги исполнува нашите високи стандарди за квалитет и перформанс.',
       ourStory: 'Нашата Приказна',
-      storyPart1: 'Основана во 2008 година, Etnography започна како мал проект од група љубители на фотографија кои сакаа да го направат квалитетното фото опрема достапно за сите во Македонија.',
-      storyPart2: 'Низ годините, пораснавме од мала локална продавница до доверливо одредиште за фотографи низ регионот, познати по нашиот внимателно куриран избор, експертски совет и исклучителна клиентска услуга.',
-      storyPart3: 'Денес, продолжуваме да им служиме на професионални фотографи и хобисти, нудејќи сè од винтирж филм фотоапарати до најновата дигитална опрема, сите поддржани од нашата посветеност кон квалитет и задоволство на клиентите.',
+      storyPart1: "Etnography официјално започна во 2024 година, но нашата љубов кон фотографијата се развива веќе околу десет години. Од првите фотографии до истражувањето на различни камери и техники, таа страст постепено прерасна во желба да го споделиме нашето искуство со другите.",
+      storyPart2: "Така настана Etnography — место за љубителите на фотографијата, со внимателно избрана понуда на аналогни и дигитални камери и фотографска опрема. Веруваме дека секоја камера има своја приказна и дека вистинската опрема може да отвори нови можности за креативност.",
+      storyPart3: "Без разлика дали ја барате вашата прва камера или следното парче за вашата колекција, сакаме да ви помогнеме да пронајдете нешто што одговара на вашиот стил, потреби и буџет.",
       yearsExperience: 'Години Искуство',
       happyCustomers: 'Задоволни Клиенти',
       productsSold: 'Продадени Производи',
@@ -313,11 +311,9 @@ export const translations: Record<Language, Translation> = {
     }
   }
 };
-
 export function getTranslation(lang: Language, path: string): string {
   const keys = path.split('.');
   let current: any = translations[lang];
-  
   for (const key of keys) {
     if (current && typeof current === 'object' && key in current) {
       current = current[key];
@@ -325,6 +321,5 @@ export function getTranslation(lang: Language, path: string): string {
       return path; // Return path if translation not found
     }
   }
-  
   return typeof current === 'string' ? current : path;
 }

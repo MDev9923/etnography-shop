@@ -1,18 +1,10 @@
+'use client';
+
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { getTranslation } from '@/lib/i18n';
-import { Language } from '@/lib/i18n';
 import { Camera, Award, Users } from 'lucide-react';
-
-// Inline hook to bypass import issues
-function useApp() {
-  return {
-    language: 'en' as Language,
-    currency: 'EUR',
-    setLanguage: (lang: Language) => console.log('Set language:', lang),
-    setCurrency: (curr: string) => console.log('Set currency:', curr)
-  };
-}
+import { useApp } from '@/lib/context';
 
 export default function AboutPage() {
   const { language } = useApp();
@@ -127,33 +119,12 @@ export default function AboutPage() {
                   </p>
                 </div>
               </div>
-              <div className="bg-muted rounded-xl p-8">
-                <div className="grid grid-cols-2 gap-6 text-center">
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">15+</div>
-                    <div className="text-muted-foreground">
-                      {getTranslation(language, 'about.yearsExperience')}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">5000+</div>
-                    <div className="text-muted-foreground">
-                      {getTranslation(language, 'about.happyCustomers')}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">1000+</div>
-                    <div className="text-muted-foreground">
-                      {getTranslation(language, 'about.productsSold')}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-4xl font-bold text-primary mb-2">50+</div>
-                    <div className="text-muted-foreground">
-                      {getTranslation(language, 'about.brandsAvailable')}
-                    </div>
-                  </div>
-                </div>
+              <div style={{ opacity: '65%' }} className="flex items-center justify-center">
+                <img
+                  src="100.png"
+                  alt="Etnography"
+                  className="w-full max-w-md h-auto"
+                />
               </div>
             </div>
           </div>

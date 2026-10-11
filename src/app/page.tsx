@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { ProductCard } from '@/components/ProductCard';
 import { getTranslation } from '@/lib/i18n';
-import { Language } from '@/lib/i18n';
+import { useApp } from '@/lib/context';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Home } from 'lucide-react';
@@ -32,16 +32,6 @@ type Product = {
   images: string[];
   status?: 'available' | 'sold';
 };
-
-// Inline hook to bypass import issues
-function useApp() {
-  return {
-    language: 'en' as Language,
-    currency: 'EUR',
-    setLanguage: (lang: Language) => console.log('Set language:', lang),
-    setCurrency: (curr: string) => console.log('Set currency:', curr)
-  };
-}
 
 export default function HomePage() {
   const { language } = useApp();
@@ -141,8 +131,8 @@ export default function HomePage() {
             </h2>
             <p className="text-lg text-muted-foreground">
               {language === 'en' 
-                ? 'Handpicked selection of our finest camera equipment'
-                : 'Рачно избрана селекција од нашата најдобра фото опрема'
+                ? 'Explore our featured products'
+                : 'Разгледајте ги нашите најнови производи'
               }
             </p>
           </div>
@@ -178,8 +168,8 @@ export default function HomePage() {
               </h3>
               <p className="text-muted-foreground">
                 {language === 'en' 
-                  ? 'Carefully selected and tested equipment for professionals'
-                  : 'Пажливо избрана и тестирана опрема за професионалци'
+                  ? 'Carefully selected and tested equipment'
+                  : 'Внимателно избрана и тестирана опрема'
                 }
               </p>
             </div>
@@ -194,7 +184,7 @@ export default function HomePage() {
               <p className="text-muted-foreground">
                 {language === 'en' 
                   ? 'Professional advice and support for your photography needs'
-                  : 'Професионален совет и поддршка за вашите фотографски потреби'
+                  : 'Професионален совет за вашите фотографски потреби'
                 }
               </p>
             </div>
@@ -209,7 +199,7 @@ export default function HomePage() {
               <p className="text-muted-foreground">
                 {language === 'en' 
                   ? 'Quick and secure delivery to your doorstep'
-                  : 'Брза и сигурна доставка до вашата врата'
+                  : 'Брза и сигурна достава до вашата врата'
                 }
               </p>
             </div>
