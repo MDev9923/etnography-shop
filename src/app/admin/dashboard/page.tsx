@@ -565,27 +565,27 @@ export default function AdminDashboard() {
             {financialSummary ? (
               <>
                 <div className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-xl font-bold mb-4">Financial Summary</h2>
+                  <h2 className="text-xl font-bold mb-4 text-black">Финансиски Преглед</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-blue-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Total Purchase Cost</p>
-                      <p className="text-lg font-bold">€{financialSummary.summary.totalPurchaseCostEUR.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">Вкупна Цена</p>
+                      <p className="text-lg font-bold text-black">{financialSummary.summary.totalPurchaseCostMKD.toFixed(0)} ден</p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Total Sales Revenue</p>
-                      <p className="text-lg font-bold">€{financialSummary.summary.totalSalesRevenueEUR.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">Вкупна Приход</p>
+                      <p className="text-lg font-bold text-black">{financialSummary.summary.totalSalesRevenueMKD.toFixed(0)} ден</p>
                     </div>
                     <div className="bg-purple-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Total Profit</p>
-                      <p className="text-lg font-bold">€{financialSummary.summary.totalProfitEUR.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">Вкупна Профит</p>
+                      <p className="text-lg font-bold text-black">{financialSummary.summary.totalProfitMKD.toFixed(0)} ден</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Matej Total</p>
-                      <p className="text-lg font-bold">€{financialSummary.summary.matejTotalEUR.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">Матеј Вкупно</p>
+                      <p className="text-lg font-bold text-black">{financialSummary.summary.matejTotalMKD.toFixed(0)} ден</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Gogo Total</p>
-                      <p className="text-lg font-bold">€{financialSummary.summary.gogoTotalEUR.toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">Гого Вкупно</p>
+                      <p className="text-lg font-bold text-black">{financialSummary.summary.gogoTotalMKD.toFixed(0)} ден</p>
                     </div>
                   </div>
                 </div>
@@ -595,27 +595,27 @@ export default function AdminDashboard() {
                     <table className="w-full text-left">
                       <thead className="bg-gray-100 text-gray-600">
                         <tr>
-                          <th className="px-4 py-3">Product</th>
-                          <th className="px-4 py-3">Selling Price</th>
-                          <th className="px-4 py-3">Purchase Amount</th>
-                          <th className="px-4 py-3">Purchased By</th>
-                          <th className="px-4 py-3">Profit</th>
-                          <th className="px-4 py-3">Matej</th>
-                          <th className="px-4 py-3">Gogo</th>
-                          <th className="px-4 py-3">Sold Date</th>
+                          <th className="px-4 py-3 text-black">Производ</th>
+                          <th className="px-4 py-3 text-black">Продажна Цена</th>
+                          <th className="px-4 py-3 text-black">Купена Цена</th>
+                          <th className="px-4 py-3 text-black">Купено Од</th>
+                          <th className="px-4 py-3 text-black">Профит</th>
+                          <th className="px-4 py-3 text-black">Матеј</th>
+                          <th className="px-4 py-3 text-black">Гого</th>
+                          <th className="px-4 py-3 text-black">Датум на Продажба</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
                         {financialSummary.products.map((product: any) => (
                           <tr key={product.id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 font-medium">{product.name}</td>
-                            <td className="px-4 py-3">€{product.sellingPriceEUR?.toFixed(2) || '-'}</td>
-                            <td className="px-4 py-3">€{product.purchaseAmountEUR?.toFixed(2) || '-'}</td>
-                            <td className="px-4 py-3">{product.purchasedBy || '-'}</td>
-                            <td className="px-4 py-3 text-green-600 font-medium">€{product.profitEUR?.toFixed(2) || '-'}</td>
-                            <td className="px-4 py-3">€{product.matejEUR?.toFixed(2) || '-'}</td>
-                            <td className="px-4 py-3">€{product.gogoEUR?.toFixed(2) || '-'}</td>
-                            <td className="px-4 py-3 text-sm">{product.soldDate ? new Date(product.soldDate).toLocaleDateString() : '-'}</td>
+                            <td className="px-4 py-3 font-medium text-black">{product.name}</td>
+                            <td className="px-4 py-3 text-black">{product.sellingPriceMKD?.toFixed(0) || '-'} ден</td>
+                            <td className="px-4 py-3 text-black">{product.purchaseAmountMKD?.toFixed(0) || '-'} ден</td>
+                            <td className="px-4 py-3 text-black">{product.purchasedBy || '-'}</td>
+                            <td className="px-4 py-3 text-green-600 font-medium text-black">{product.profitMKD?.toFixed(0) || '-'} ден</td>
+                            <td className="px-4 py-3 text-black">{product.matejMKD?.toFixed(0) || '-'} ден</td>
+                            <td className="px-4 py-3 text-black">{product.gogoMKD?.toFixed(0) || '-'} ден</td>
+                            <td className="px-4 py-3 text-sm text-black">{product.soldDate ? new Date(product.soldDate).toLocaleDateString() : '-'}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -624,7 +624,7 @@ export default function AdminDashboard() {
                 </div>
               </>
             ) : (
-              <div className="text-center py-8 text-gray-500">Loading financial data...</div>
+              <div className="text-center py-8 text-gray-500">Вчитување на финансиски податоци...</div>
             )}
           </div>
         )}
