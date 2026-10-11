@@ -216,6 +216,47 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  const addExpense = async (productId: number, category: string, person: string, note: string, amountEUR: string, amountMKD: string) => {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/api/admin/expenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        productId,
+        category,
+        person,
+        note,
+        amountEUR: amountEUR ? Number(amountEUR) : null,
+        amountMKD: amountMKD ? Number(amountMKD) : null,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to add expense');
+    }
+
+    await fetchFinancialSummary();
+  };
+
+  const deleteExpense = async (expenseId: number) => {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/api/admin/expenses/${expenseId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete expense');
+    }
+
+    await fetchFinancialSummary();
+  };
+
   const fetchProducts = useCallback(async () => {
     try {
       setError('');
@@ -621,6 +662,59 @@ export default function AdminDashboard() {
                       </tbody>
                     </table>
                   </div>
+                </div>
+
+                {/* Expenses Section */}
+                <div className="bg-white rounded-lg shadow p-6">
+                  <h3 className="text-lg font-bold mb-4 text-black">Трошоци по Продукти</h3>
+                  {financialSummary.products.map((product: any) => (
+                    <div key={product.id} className="border-b pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium text-black">{product.name}</h4>
+                        <button
+                          onClick={() => {
+                            const category = prompt('Категорија на трошок:');
+                            const person = prompt('Ко го направил трошокот? (Matej/Gogo)');
+                            const note = prompt('Забелешка:');
+                            const amountMKD = prompt('Цена во MKD:');
+                            if (category && person && amountMKD) {
+                              const amountEUR = (Number(amountMKD) / 62).toFixed(2);
+                              addExpense(product.id, category, person, note || '', amountEUR, amountMKD);
+                            }
+                          }}
+                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                        >
+                          + Додај Трошок
+                        </button>
+                      </div>
+                      {product.expenses && product.expenses.length > 0 ? (
+                        <div className="space-y-2">
+                          {product.expenses.map((expense: any) => (
+                            <div key={expense.id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
+                              <div className="text-sm text-black">
+                                <span className="font-medium">{expense.category}</span>
+                                <span className="ml-2 text-gray-600">({expense.person})</span>
+                                {expense.note && <span className="ml-2 text-gray-500">- {expense.note}</span>}
+                                <span className="ml-2 font-medium">{expense.amountMKD?.toFixed(0) || '-'} ден</span>
+                              </div>
+                              <button
+                                onClick={() => {
+                                  if (confirm('Да избришете овој трошок?')) {
+                                    deleteExpense(expense.id);
+                                  }
+                                }}
+                                className="text-red-600 hover:text-red-800 text-sm"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">Нема трошоци</p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </>
             ) : (

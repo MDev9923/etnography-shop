@@ -132,6 +132,38 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Stats Section */}
+      <section className="py-16 bg-muted">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div className="bg-background rounded-2xl p-8">
+              <p className="text-4xl font-bold text-primary mb-2">15+</p>
+              <p className="text-muted-foreground">
+                {language === 'en' ? 'Years Experience' : 'Години Искуство'}
+              </p>
+            </div>
+            <div className="bg-background rounded-2xl p-8">
+              <p className="text-4xl font-bold text-primary mb-2">5000+</p>
+              <p className="text-muted-foreground">
+                {language === 'en' ? 'Happy Customers' : 'Задоволни Клиенти'}
+              </p>
+            </div>
+            <div className="bg-background rounded-2xl p-8">
+              <p className="text-4xl font-bold text-primary mb-2">1000+</p>
+              <p className="text-muted-foreground">
+                {language === 'en' ? 'Products Sold' : 'Продадени Производи'}
+              </p>
+            </div>
+            <div className="bg-background rounded-2xl p-8">
+              <p className="text-4xl font-bold text-primary mb-2">50+</p>
+              <p className="text-muted-foreground">
+                {language === 'en' ? 'Brands Available' : 'Достапни Брендови'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Products Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
