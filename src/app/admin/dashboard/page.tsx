@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Edit, Trash2, LogOut, Search, Upload } from 'lucide-react';
@@ -203,6 +203,14 @@ export default function AdminDashboard() {
     amountMKD: '',
     date: new Date().toISOString().split('T')[0],
     paidBy: ''
+  });
+  const [soldFilters, setSoldFilters] = useState({
+    dateFrom: '',
+    dateTo: '',
+    purchasedBy: '',
+    expenseDateFrom: '',
+    expenseDateTo: '',
+    expensePaidBy: ''
   });
 
   const fetchFinancialSummary = useCallback(async () => {
@@ -711,10 +719,92 @@ export default function AdminDashboard() {
         {/* Sold Tab */}
         {activeTab === 'sold' && (
           <div className="space-y-6">
+            {/* Filters */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold mb-4 text-black">Филтри</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Product Filters */}
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-gray-700">Продажби</h4>
+                  <label className="block text-xs text-gray-600">Датум од</label>
+                  <input
+                    type="date"
+                    value={soldFilters.dateFrom}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  <label className="block text-xs text-gray-600">Датум до</label>
+                  <input
+                    type="date"
+                    value={soldFilters.dateTo}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  <label className="block text-xs text-gray-600">Купено од</label>
+                  <select
+                    value={soldFilters.purchasedBy}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, purchasedBy: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  >
+                    <option value="">Сите</option>
+                    <option value="Matej">Matej</option>
+                    <option value="Gogo">Gogo</option>
+                    <option value="Drugo">Drugo</option>
+                  </select>
+                </div>
+
+                {/* Expense Filters */}
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-gray-700">Трошоци</h4>
+                  <label className="block text-xs text-gray-600">Датум од</label>
+                  <input
+                    type="date"
+                    value={soldFilters.expenseDateFrom}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateFrom: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  <label className="block text-xs text-gray-600">Датум до</label>
+                  <input
+                    type="date"
+                    value={soldFilters.expenseDateTo}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateTo: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  <label className="block text-xs text-gray-600">Платено од</label>
+                  <select
+                    value={soldFilters.expensePaidBy}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, expensePaidBy: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  >
+                    <option value="">Сите</option>
+                    <option value="Matej">Matej</option>
+                    <option value="Gogo">Gogo</option>
+                  </select>
+                </div>
+
+                {/* Clear Filters */}
+                <div className="flex items-end">
+                  <button
+                    onClick={() => setSoldFilters({
+                      dateFrom: '',
+                      dateTo: '',
+                      purchasedBy: '',
+                      expenseDateFrom: '',
+                      expenseDateTo: '',
+                      expensePaidBy: ''
+                    })}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
+                  >
+                    Исчисти Филтри
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {financialSummary ? (
               <>
                 <div className="bg-white rounded-lg shadow p-6">
-                  <h2 className="text-xl font-bold mb-4 text-black">Финансиски Преглед</h2>
+                  <h2 className="text-xl font-bold mb-4 text-black">Финансиски Преглед (Филтрирано)</h2>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-blue-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600">Вкупна Цена</p>
@@ -757,7 +847,14 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {financialSummary.products.map((product: any) => (
+                        {financialSummary.products
+                          .filter((product: any) => {
+                            if (soldFilters.purchasedBy && product.purchasedBy !== soldFilters.purchasedBy) return false;
+                            if (soldFilters.dateFrom && product.soldDate && product.soldDate < soldFilters.dateFrom) return false;
+                            if (soldFilters.dateTo && product.soldDate && product.soldDate > soldFilters.dateTo) return false;
+                            return true;
+                          })
+                          .map((product: any) => (
                           <tr key={product.id} className="hover:bg-gray-50">
                             <td className="px-4 py-3 font-medium text-black">{product.name}</td>
                             <td className="px-4 py-3 text-black">{product.sellingPriceMKD?.toFixed(0) || '-'} ден</td>
@@ -800,7 +897,14 @@ export default function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {financialSummary.expenses.map((expense: any) => (
+                          {financialSummary.expenses
+                            .filter((expense: any) => {
+                              if (soldFilters.expensePaidBy && expense.paidBy !== soldFilters.expensePaidBy) return false;
+                              if (soldFilters.expenseDateFrom && expense.date < soldFilters.expenseDateFrom) return false;
+                              if (soldFilters.expenseDateTo && expense.date > soldFilters.expenseDateTo) return false;
+                              return true;
+                            })
+                            .map((expense: any) => (
                             <tr key={expense.id} className="hover:bg-gray-50">
                               <td className="px-4 py-3 font-medium text-black">{expense.category}</td>
                               <td className="px-4 py-3 text-black">{expense.description || '-'}</td>
