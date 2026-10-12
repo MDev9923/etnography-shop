@@ -216,7 +216,7 @@ export default function AdminDashboard() {
     }
   }, []);
 
-  const addExpense = async (productId: number, category: string, person: string, note: string, amountEUR: string, amountMKD: string) => {
+  const addExpense = async (category: string, description: string, amountEUR: string, amountMKD: string, date: string, paidBy: string) => {
     const token = localStorage.getItem('adminToken');
     const response = await fetch(`${API_URL}/api/admin/expenses`, {
       method: 'POST',
@@ -225,17 +225,42 @@ export default function AdminDashboard() {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        productId,
         category,
-        person,
-        note,
+        description,
         amountEUR: amountEUR ? Number(amountEUR) : null,
         amountMKD: amountMKD ? Number(amountMKD) : null,
+        date,
+        paidBy,
       }),
     });
 
     if (!response.ok) {
       throw new Error('Failed to add expense');
+    }
+
+    await fetchFinancialSummary();
+  };
+
+  const updateExpense = async (expenseId: number, category: string, description: string, amountEUR: string, amountMKD: string, date: string, paidBy: string) => {
+    const token = localStorage.getItem('adminToken');
+    const response = await fetch(`${API_URL}/api/admin/expenses/${expenseId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        category,
+        description,
+        amountEUR: amountEUR ? Number(amountEUR) : null,
+        amountMKD: amountMKD ? Number(amountMKD) : null,
+        date,
+        paidBy,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update expense');
     }
 
     await fetchFinancialSummary();
@@ -623,10 +648,12 @@ export default function AdminDashboard() {
                     <div className="bg-orange-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600">Матеј Вкупно</p>
                       <p className="text-lg font-bold text-black">{financialSummary.summary.matejTotalMKD.toFixed(0)} ден</p>
+                      <p className="text-xs text-gray-500">(Трошоци: {financialSummary.summary.matejExpensesMKD?.toFixed(0) || 0} ден)</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600">Гого Вкупно</p>
                       <p className="text-lg font-bold text-black">{financialSummary.summary.gogoTotalMKD.toFixed(0)} ден</p>
+                      <p className="text-xs text-gray-500">(Трошоци: {financialSummary.summary.gogoExpensesMKD?.toFixed(0) || 0} ден)</p>
                     </div>
                   </div>
                 </div>
@@ -664,57 +691,85 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Expenses Section */}
+                {/* General Expenses Section */}
                 <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-lg font-bold mb-4 text-black">Трошоци по Продукти</h3>
-                  {financialSummary.products.map((product: any) => (
-                    <div key={product.id} className="border-b pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0">
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="font-medium text-black">{product.name}</h4>
-                        <button
-                          onClick={() => {
-                            const category = prompt('Категорија на трошок:');
-                            const person = prompt('Ко го направил трошокот? (Matej/Gogo)');
-                            const note = prompt('Забелешка:');
-                            const amountMKD = prompt('Цена во MKD:');
-                            if (category && person && amountMKD) {
-                              const amountEUR = (Number(amountMKD) / 62).toFixed(2);
-                              addExpense(product.id, category, person, note || '', amountEUR, amountMKD);
-                            }
-                          }}
-                          className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-                        >
-                          + Додај Трошок
-                        </button>
-                      </div>
-                      {product.expenses && product.expenses.length > 0 ? (
-                        <div className="space-y-2">
-                          {product.expenses.map((expense: any) => (
-                            <div key={expense.id} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-                              <div className="text-sm text-black">
-                                <span className="font-medium">{expense.category}</span>
-                                <span className="ml-2 text-gray-600">({expense.person})</span>
-                                {expense.note && <span className="ml-2 text-gray-500">- {expense.note}</span>}
-                                <span className="ml-2 font-medium">{expense.amountMKD?.toFixed(0) || '-'} ден</span>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  if (confirm('Да избришете овој трошок?')) {
-                                    deleteExpense(expense.id);
-                                  }
-                                }}
-                                className="text-red-600 hover:text-red-800 text-sm"
-                              >
-                                ×
-                              </button>
-                            </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-bold text-black">Општи Трошоци</h3>
+                    <button
+                      onClick={() => {
+                        const category = prompt('Категорија:');
+                        const description = prompt('Опис:');
+                        const amountMKD = prompt('Сума во MKD:');
+                        const date = prompt('Датум (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+                        const paidBy = prompt('Платено од (Matej/Gogo):');
+                        if (category && amountMKD && date && paidBy) {
+                          const amountEUR = (Number(amountMKD) / 62).toFixed(2);
+                          addExpense(category, description || '', amountEUR, amountMKD, date, paidBy);
+                        }
+                      }}
+                      className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                    >
+                      + Додај Трошок
+                    </button>
+                  </div>
+
+                  {financialSummary.expenses && financialSummary.expenses.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left">
+                        <thead className="bg-gray-100 text-gray-600">
+                          <tr>
+                            <th className="px-4 py-3 text-black">Категорија</th>
+                            <th className="px-4 py-3 text-black">Опис</th>
+                            <th className="px-4 py-3 text-black">Сума</th>
+                            <th className="px-4 py-3 text-black">Датум</th>
+                            <th className="px-4 py-3 text-black">Платено од</th>
+                            <th className="px-4 py-3 text-black">Акции</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {financialSummary.expenses.map((expense: any) => (
+                            <tr key={expense.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-3 font-medium text-black">{expense.category}</td>
+                              <td className="px-4 py-3 text-black">{expense.description || '-'}</td>
+                              <td className="px-4 py-3 text-black">{expense.amountMKD?.toFixed(0) || '-'} ден</td>
+                              <td className="px-4 py-3 text-black">{new Date(expense.date).toLocaleDateString()}</td>
+                              <td className="px-4 py-3 text-black">{expense.paidBy}</td>
+                              <td className="px-4 py-3">
+                                <button
+                                  onClick={() => {
+                                    const category = prompt('Категорија:', expense.category);
+                                    const description = prompt('Опис:', expense.description || '');
+                                    const amountMKD = prompt('Сума во MKD:', expense.amountMKD?.toString() || '');
+                                    const date = prompt('Датум (YYYY-MM-DD):', expense.date || '');
+                                    const paidBy = prompt('Платено од (Matej/Gogo):', expense.paidBy || '');
+                                    if (category && amountMKD && date && paidBy) {
+                                      const amountEUR = (Number(amountMKD) / 62).toFixed(2);
+                                      updateExpense(expense.id, category, description, amountEUR, amountMKD, date, paidBy);
+                                    }
+                                  }}
+                                  className="text-blue-600 hover:text-blue-800 text-sm mr-2"
+                                >
+                                  Уреди
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (confirm('Да избришете овој трошок?')) {
+                                      deleteExpense(expense.id);
+                                    }
+                                  }}
+                                  className="text-red-600 hover:text-red-800 text-sm"
+                                >
+                                  Избриши
+                                </button>
+                              </td>
+                            </tr>
                           ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500 italic">Нема трошоци</p>
-                      )}
+                        </tbody>
+                      </table>
                     </div>
-                  ))}
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">Нема трошоци</p>
+                  )}
                 </div>
               </>
             ) : (
