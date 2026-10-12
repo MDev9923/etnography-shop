@@ -744,7 +744,7 @@ export default function AdminDashboard() {
                                     const paidBy = prompt('Платено од (Matej/Gogo):', expense.paidBy || '');
                                     if (category && amountMKD && date && paidBy) {
                                       const amountEUR = (Number(amountMKD) / 62).toFixed(2);
-                                      updateExpense(expense.id, category, description, amountEUR, amountMKD, date, paidBy);
+                                      updateExpense(expense.id, category, description ?? ' ', amountEUR, amountMKD, date, paidBy);
                                     }
                                   }}
                                   className="text-blue-600 hover:text-blue-800 text-sm mr-2"
