@@ -17,7 +17,7 @@ function getImageUrl(value?: string): string {
     return '/placeholder-product.jpg';
   }
 
-  // Repair URLs that accidentally contain the API URL before an R2 URL.
+  // Repair URLs containing the API URL before a complete image URL.
   while (
     url.startsWith(API_URL) &&
     /^https?:\/\//i.test(url.slice(API_URL.length))
@@ -25,12 +25,10 @@ function getImageUrl(value?: string): string {
     url = url.slice(API_URL.length);
   }
 
-  // Preserve complete R2 and other public image URLs.
   if (/^https?:\/\//i.test(url)) {
     return url;
   }
 
-  // Support older images served by the backend.
   if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
     return `${API_URL}/${url.replace(/^\/+/, '')}`;
   }
@@ -55,7 +53,7 @@ interface Product {
     en: string;
     mk: string;
   };
-  specs: Record<string, any>;
+  specs: Record<string, unknown>;
   images: string[];
 }
 
@@ -74,12 +72,13 @@ export function ProductCard({
     currency === 'EUR' ? product.priceEUR : product.priceMKD;
 
   const formattedPrice = formatPrice(price ?? 0, currency);
+
   const productName =
     product.name[language] || product.name.en || product.brand;
 
   const conditionText = getTranslation(
     language,
-    `catalog.conditions.${product.condition.replace(' ', '')}`
+    `catalog.conditions.${product.condition.replace(/\s+/g, '')}`
   );
 
   const isSold = product.status === 'sold';
@@ -89,8 +88,14 @@ export function ProductCard({
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
       <Link href={productUrl} className="block">
-        <div className="relative aspect-[4/3] bg-white overflow-hidden">
+        <div
+          className="relative aspect-[4/3] bg-white overflow-hidden bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/camera-bg.png')",
+          }}
+        >
           <img
+            key={imageUrl}
             src={imageUrl}
             alt={productName}
             loading="lazy"
@@ -98,7 +103,9 @@ export function ProductCard({
             onError={(e) => {
               const image = e.currentTarget;
 
-              if (image.dataset.fallbackApplied === 'true') return;
+              if (image.dataset.fallbackApplied === 'true') {
+                return;
+              }
 
               image.dataset.fallbackApplied = 'true';
               image.src = '/placeholder-product.jpg';
@@ -106,13 +113,13 @@ export function ProductCard({
           />
 
           {showConditionBadge && (
-            <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs font-medium text-gray-700">
+            <div className="absolute z-10 top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs font-medium text-gray-700">
               {conditionText}
             </div>
           )}
 
           <div
-            className={`absolute top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
+            className={`absolute z-10 top-2 right-2 px-2 py-1 rounded text-xs font-semibold ${
               isSold
                 ? 'bg-red-600 text-white'
                 : 'bg-green-100 text-green-800'
