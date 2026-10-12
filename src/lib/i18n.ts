@@ -319,7 +319,7 @@ export function getTranslation(lang: Language, path: string): string {
     if (current && typeof current === 'object' && key in current) {
       current = current[key];
     } else {
-      return path; // Return path if translation not found
+      return path;
     }
   }
   return typeof current === 'string' ? current : path;
