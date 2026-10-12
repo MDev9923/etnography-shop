@@ -195,6 +195,15 @@ export default function AdminDashboard() {
   const [formData, setFormData] = useState<ProductForm>(createEmptyForm);
   const [activeTab, setActiveTab] = useState<'all' | 'sold'>('all');
   const [financialSummary, setFinancialSummary] = useState<any>(null);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [expenseFormData, setExpenseFormData] = useState({
+    category: '',
+    description: '',
+    amountMKD: '',
+    date: new Date().toISOString().split('T')[0],
+    paidBy: ''
+  });
 
   const fetchFinancialSummary = useCallback(async () => {
     try {
@@ -239,6 +248,14 @@ export default function AdminDashboard() {
     }
 
     await fetchFinancialSummary();
+    setShowExpenseModal(false);
+    setExpenseFormData({
+      category: '',
+      description: '',
+      amountMKD: '',
+      date: new Date().toISOString().split('T')[0],
+      paidBy: ''
+    });
   };
 
   const updateExpense = async (expenseId: number, category: string, description: string, amountEUR: string, amountMKD: string, date: string, paidBy: string) => {
@@ -264,6 +281,15 @@ export default function AdminDashboard() {
     }
 
     await fetchFinancialSummary();
+    setShowExpenseModal(false);
+    setEditingExpense(null);
+    setExpenseFormData({
+      category: '',
+      description: '',
+      amountMKD: '',
+      date: new Date().toISOString().split('T')[0],
+      paidBy: ''
+    });
   };
 
   const deleteExpense = async (expenseId: number) => {
@@ -280,6 +306,56 @@ export default function AdminDashboard() {
     }
 
     await fetchFinancialSummary();
+  };
+
+  const openAddExpenseModal = () => {
+    setEditingExpense(null);
+    setExpenseFormData({
+      category: '',
+      description: '',
+      amountMKD: '',
+      date: new Date().toISOString().split('T')[0],
+      paidBy: ''
+    });
+    setShowExpenseModal(true);
+  };
+
+  const openEditExpenseModal = (expense: any) => {
+    setEditingExpense(expense);
+    setExpenseFormData({
+      category: expense.category,
+      description: expense.description || '',
+      amountMKD: expense.amountMKD?.toString() || '',
+      date: expense.date,
+      paidBy: expense.paidBy
+    });
+    setShowExpenseModal(true);
+  };
+
+  const handleExpenseSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const amountEUR = expenseFormData.amountMKD ? (Number(expenseFormData.amountMKD) / 62).toFixed(2) : '';
+
+    if (editingExpense) {
+      await updateExpense(
+        editingExpense.id,
+        expenseFormData.category,
+        expenseFormData.description,
+        amountEUR,
+        expenseFormData.amountMKD,
+        expenseFormData.date,
+        expenseFormData.paidBy
+      );
+    } else {
+      await addExpense(
+        expenseFormData.category,
+        expenseFormData.description,
+        amountEUR,
+        expenseFormData.amountMKD,
+        expenseFormData.date,
+        expenseFormData.paidBy
+      );
+    }
   };
 
   const fetchProducts = useCallback(async () => {
@@ -696,17 +772,7 @@ export default function AdminDashboard() {
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-black">Општи Трошоци</h3>
                     <button
-                      onClick={() => {
-                        const category = prompt('Категорија:');
-                        const description = prompt('Опис:');
-                        const amountMKD = prompt('Сума во MKD:');
-                        const date = prompt('Датум (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-                        const paidBy = prompt('Платено од (Matej/Gogo):');
-                        if (category && amountMKD && date && paidBy) {
-                          const amountEUR = (Number(amountMKD) / 62).toFixed(2);
-                          addExpense(category, description || '', amountEUR, amountMKD, date, paidBy);
-                        }
-                      }}
+                      onClick={openAddExpenseModal}
                       className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
                     >
                       + Додај Трошок
@@ -736,17 +802,7 @@ export default function AdminDashboard() {
                               <td className="px-4 py-3 text-black">{expense.paidBy}</td>
                               <td className="px-4 py-3">
                                 <button
-                                  onClick={() => {
-                                    const category = prompt('Категорија:', expense.category);
-                                    const description = prompt('Опис:', expense.description || '');
-                                    const amountMKD = prompt('Сума во MKD:', expense.amountMKD?.toString() || '');
-                                    const date = prompt('Датум (YYYY-MM-DD):', expense.date || '');
-                                    const paidBy = prompt('Платено од (Matej/Gogo):', expense.paidBy || '');
-                                    if (category && amountMKD && date && paidBy) {
-                                      const amountEUR = (Number(amountMKD) / 62).toFixed(2);
-                                      updateExpense(expense.id, category, description ?? ' ', amountEUR, amountMKD, date, paidBy);
-                                    }
-                                  }}
+                                  onClick={() => openEditExpenseModal(expense)}
                                   className="text-blue-600 hover:text-blue-800 text-sm mr-2"
                                 >
                                   Уреди
@@ -1461,6 +1517,138 @@ export default function AdminDashboard() {
                     : editingProduct
                       ? 'Update Product'
                       : 'Create Product'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Expense Modal */}
+      {showExpenseModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="expense-modal-title"
+            className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6"
+          >
+            <h2
+              id="expense-modal-title"
+              className="text-2xl font-bold mb-6"
+            >
+              {editingExpense ? 'Уреди Трошок' : 'Додај Трошок'}
+            </h2>
+
+            <form onSubmit={handleExpenseSubmit} className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Категорија
+                <input
+                  type="text"
+                  value={expenseFormData.category}
+                  onChange={(e) =>
+                    setExpenseFormData((previous) => ({
+                      ...previous,
+                      category: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700">
+                Опис
+                <textarea
+                  rows={2}
+                  value={expenseFormData.description}
+                  onChange={(e) =>
+                    setExpenseFormData((previous) => ({
+                      ...previous,
+                      description: e.target.value,
+                    }))
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700">
+                Сума во MKD
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={expenseFormData.amountMKD}
+                  onChange={(e) =>
+                    setExpenseFormData((previous) => ({
+                      ...previous,
+                      amountMKD: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700">
+                Датум
+                <input
+                  type="date"
+                  value={expenseFormData.date}
+                  onChange={(e) =>
+                    setExpenseFormData((previous) => ({
+                      ...previous,
+                      date: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </label>
+
+              <label className="block text-sm font-medium text-gray-700">
+                Платено од
+                <select
+                  value={expenseFormData.paidBy}
+                  onChange={(e) =>
+                    setExpenseFormData((previous) => ({
+                      ...previous,
+                      paidBy: e.target.value,
+                    }))
+                  }
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select...</option>
+                  <option value="Matej">Matej</option>
+                  <option value="Gogo">Gogo</option>
+                </select>
+              </label>
+
+              <div className="flex justify-end gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowExpenseModal(false);
+                    setEditingExpense(null);
+                    setExpenseFormData({
+                      category: '',
+                      description: '',
+                      amountMKD: '',
+                      date: new Date().toISOString().split('T')[0],
+                      paidBy: ''
+                    });
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  Откажи
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+                >
+                  {editingExpense ? 'Ажурирај' : 'Додај'}
                 </button>
               </div>
             </form>
