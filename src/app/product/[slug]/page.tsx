@@ -12,7 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Instagram,
-  Mail
+  Mail,
 } from 'lucide-react';
 
 type Product = {
@@ -37,14 +37,9 @@ const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
 ).replace(/\/+$/, '');
 
-const PRODUCT_BACKGROUND = {
-  backgroundImage: "url('/camera-bg.png')"
-};
-
 function getImageUrl(image: string): string {
   let url = image.trim();
 
-  // Repair a backend URL accidentally prefixed to a complete image URL.
   if (url.startsWith(API_URL)) {
     const remainder = url.slice(API_URL.length);
 
@@ -133,7 +128,6 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <p className="text-center text-gray-900">
             {language === 'en'
@@ -141,7 +135,6 @@ export default function ProductPage() {
               : 'Се вчитува производот...'}
           </p>
         </main>
-
         <Footer />
       </div>
     );
@@ -151,7 +144,6 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -159,7 +151,6 @@ export default function ProductPage() {
                 ? 'Product Not Found'
                 : 'Производот не е пронајден'}
             </h1>
-
             <p className="text-gray-600">
               {language === 'en'
                 ? 'The product you are looking for does not exist.'
@@ -167,7 +158,6 @@ export default function ProductPage() {
             </p>
           </div>
         </main>
-
         <Footer />
       </div>
     );
@@ -176,7 +166,6 @@ export default function ProductPage() {
   const isSold = product.status === 'sold';
   const price = currency === 'EUR' ? product.priceEUR : product.priceMKD;
   const formattedPrice = formatPrice(price ?? 0, currency);
-
   const productName = product.name[language] || product.name.en;
   const description =
     product.description?.[language] || product.description?.en || '';
@@ -243,7 +232,7 @@ export default function ProductPage() {
         '',
         language === 'en'
           ? 'Please let me know about availability and payment options.'
-          : 'Ве молам известете ме за достапност и детали за плаќање.'
+          : 'Ве молам известете ме за достапност и детали за плаќање.',
       ].join('\n')
     );
 
@@ -274,13 +263,13 @@ export default function ProductPage() {
           {/* Image gallery */}
           <div className="min-w-0 space-y-4">
             <div
-              className="relative aspect-square w-full bg-white bg-cover bg-center bg-no-repeat rounded-lg border border-gray-200 overflow-hidden"
-              style={PRODUCT_BACKGROUND}
+              className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: "url('/camera-bg.png')" }}
             >
               <img
                 src={currentImage}
                 alt={productName}
-                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8"
+                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8 scale-150"
               />
 
               {images.length > 1 && (
@@ -288,7 +277,7 @@ export default function ProductPage() {
                   <button
                     type="button"
                     onClick={prevImage}
-                    className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
+                    className="absolute z-10 left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
                     aria-label={
                       language === 'en' ? 'Previous image' : 'Претходна слика'
                     }
@@ -299,7 +288,7 @@ export default function ProductPage() {
                   <button
                     type="button"
                     onClick={nextImage}
-                    className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
+                    className="absolute z-10 right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
                     aria-label={
                       language === 'en' ? 'Next image' : 'Следна слика'
                     }
@@ -317,12 +306,11 @@ export default function ProductPage() {
                     type="button"
                     key={`${image}-${index}`}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 bg-white bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`flex-shrink-0 w-20 h-20 bg-white rounded-lg overflow-hidden border-2 transition-all ${
                       index === safeIndex
                         ? 'border-blue-500 opacity-100'
                         : 'border-gray-200 opacity-70 hover:opacity-100'
                     }`}
-                    style={PRODUCT_BACKGROUND}
                     aria-label={
                       language === 'en'
                         ? `View image ${index + 1}`
@@ -345,22 +333,14 @@ export default function ProductPage() {
           <div className="min-w-0 space-y-6">
             <div>
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-2">
-                <span className="text-sm text-gray-500">
-                  {product.brand}
-                </span>
-
+                <span className="text-sm text-gray-500">{product.brand}</span>
                 <span className="text-gray-300">•</span>
-
-                <span className="text-sm text-gray-500">
-                  {categoryText}
-                </span>
+                <span className="text-sm text-gray-500">{categoryText}</span>
 
                 {typeText && (
                   <>
                     <span className="text-gray-300">•</span>
-                    <span className="text-sm text-gray-500">
-                      {typeText}
-                    </span>
+                    <span className="text-sm text-gray-500">{typeText}</span>
                   </>
                 )}
               </div>
@@ -402,10 +382,7 @@ export default function ProductPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {getTranslation(language, 'product.description')}
               </h3>
-
-              <p className="text-gray-600 leading-relaxed">
-                {description}
-              </p>
+              <p className="text-gray-600 leading-relaxed">{description}</p>
             </div>
 
             <div>
@@ -420,7 +397,6 @@ export default function ProductPage() {
                       <dt className="text-sm font-medium text-gray-500 capitalize">
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </dt>
-
                       <dd className="text-sm text-gray-900 font-medium text-right">
                         {String(value)}
                       </dd>
@@ -431,7 +407,6 @@ export default function ProductPage() {
                     <dt className="text-sm font-medium text-gray-500">
                       {getTranslation(language, 'product.condition')}
                     </dt>
-
                     <dd className="text-sm text-gray-900 font-medium text-right">
                       {conditionText}
                     </dd>
@@ -452,7 +427,6 @@ export default function ProductPage() {
                 }`}
               >
                 <Instagram className="h-5 w-5" />
-
                 <span>
                   {isSold
                     ? language === 'en'
@@ -470,7 +444,6 @@ export default function ProductPage() {
                 className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
               >
                 <Mail className="h-5 w-5" />
-
                 <span>
                   {language === 'en'
                     ? 'Email for Order'
