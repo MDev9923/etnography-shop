@@ -244,7 +244,9 @@ export default function AdminDashboard() {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to add expense');
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      console.error('Add expense error:', errorData);
+      throw new Error(errorData.error || 'Failed to add expense');
     }
 
     await fetchFinancialSummary();
@@ -336,25 +338,30 @@ export default function AdminDashboard() {
     e.preventDefault();
     const amountEUR = expenseFormData.amountMKD ? (Number(expenseFormData.amountMKD) / 62).toFixed(2) : '';
 
-    if (editingExpense) {
-      await updateExpense(
-        editingExpense.id,
-        expenseFormData.category,
-        expenseFormData.description,
-        amountEUR,
-        expenseFormData.amountMKD,
-        expenseFormData.date,
-        expenseFormData.paidBy
-      );
-    } else {
-      await addExpense(
-        expenseFormData.category,
-        expenseFormData.description,
-        amountEUR,
-        expenseFormData.amountMKD,
-        expenseFormData.date,
-        expenseFormData.paidBy
-      );
+    try {
+      if (editingExpense) {
+        await updateExpense(
+          editingExpense.id,
+          expenseFormData.category,
+          expenseFormData.description,
+          amountEUR,
+          expenseFormData.amountMKD,
+          expenseFormData.date,
+          expenseFormData.paidBy
+        );
+      } else {
+        await addExpense(
+          expenseFormData.category,
+          expenseFormData.description,
+          amountEUR,
+          expenseFormData.amountMKD,
+          expenseFormData.date,
+          expenseFormData.paidBy
+        );
+      }
+    } catch (error) {
+      console.error('Error submitting expense:', error);
+      alert('Error saving expense. Please check if it was saved after refresh.');
     }
   };
 

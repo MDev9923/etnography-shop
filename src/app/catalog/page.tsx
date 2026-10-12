@@ -181,6 +181,7 @@ export default function CatalogPage() {
           onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
           placeholder={getTranslation(language, 'common.search')}
+          key="search-input"
         />
       </div>
 
