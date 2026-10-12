@@ -721,11 +721,11 @@ export default function AdminDashboard() {
                       <p className="text-lg font-bold text-black">{financialSummary.summary.totalPurchaseCostMKD.toFixed(0)} ден</p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Вкупна Приход</p>
+                      <p className="text-sm text-gray-600">Вкупно Приход</p>
                       <p className="text-lg font-bold text-black">{financialSummary.summary.totalSalesRevenueMKD.toFixed(0)} ден</p>
                     </div>
                     <div className="bg-purple-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Вкупна Профит</p>
+                      <p className="text-sm text-gray-600">Вкупно Профит</p>
                       <p className="text-lg font-bold text-black">{financialSummary.summary.totalProfitMKD.toFixed(0)} ден</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
