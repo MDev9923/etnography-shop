@@ -269,7 +269,7 @@ export default function ProductPage() {
               <img
                 src={currentImage}
                 alt={productName}
-                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8 scale-150"
+                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8 scale-125"
               />
 
               {images.length > 1 && (
