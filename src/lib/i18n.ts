@@ -203,7 +203,8 @@ export const translations: Record<Language, Translation> = {
       types: {
         film: 'Филм',
         digital: 'Дигитално',
-        both: 'Двете'
+        both: 'Двете',
+        analog: 'Аналогно'
       },
       filmTypes: {
         mm35Color: '35mm во боја',
