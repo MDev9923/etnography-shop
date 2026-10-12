@@ -79,15 +79,6 @@ export default function CatalogPage() {
   const uniqueBrands = useMemo(() => Array.from(new Set(allProducts.map(p => p.brand))), [allProducts]);
   const uniqueMounts = useMemo(() => Array.from(new Set(allProducts.map(p => p.mount).filter(m => m !== 'N/A'))), [allProducts]);
 
-  // Initialize filters from URL params
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const search = urlParams.get('search') || '';
-      setFilters(prev => ({ ...prev, search }));
-    }
-  }, []);
-
   // Filter and sort products
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = allProducts.filter(product => {
