@@ -215,7 +215,7 @@ export const translations: Record<Language, Translation> = {
       conditions: {
         likeNew: 'Како Ново',
         excellent: 'Одлично',
-        veryGood: 'Многу Добро',
+        'very-good': 'Многу Добро',
         good: 'Добро',
         low: 'Слабо'
       }
