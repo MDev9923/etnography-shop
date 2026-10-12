@@ -37,6 +37,10 @@ const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
 ).replace(/\/+$/, '');
 
+const PRODUCT_BACKGROUND = {
+  backgroundImage: "url('/camera-bg.png')"
+};
+
 function getImageUrl(image: string): string {
   let url = image.trim();
 
@@ -269,7 +273,10 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image gallery */}
           <div className="min-w-0 space-y-4">
-            <div className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div
+              className="relative aspect-square w-full bg-white bg-cover bg-center bg-no-repeat rounded-lg border border-gray-200 overflow-hidden"
+              style={PRODUCT_BACKGROUND}
+            >
               <img
                 src={currentImage}
                 alt={productName}
@@ -310,11 +317,12 @@ export default function ProductPage() {
                     type="button"
                     key={`${image}-${index}`}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 bg-white rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`flex-shrink-0 w-20 h-20 bg-white bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden border-2 transition-all ${
                       index === safeIndex
                         ? 'border-blue-500 opacity-100'
                         : 'border-gray-200 opacity-70 hover:opacity-100'
                     }`}
+                    style={PRODUCT_BACKGROUND}
                     aria-label={
                       language === 'en'
                         ? `View image ${index + 1}`
