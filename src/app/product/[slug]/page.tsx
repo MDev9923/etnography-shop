@@ -40,7 +40,7 @@ const API_URL = (
 const imageBackground = {
   backgroundImage: "url('/camera-bg.png')",
   backgroundPosition: 'center',
-  backgroundSize: 'contain',
+  backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
 };
 
