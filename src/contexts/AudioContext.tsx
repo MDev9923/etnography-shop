@@ -23,8 +23,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
   const tracks = [
-    { file: '/background-music.mp3', title: 'ЕБСФ - Денови' },
-    { file: '/background-music1.mp3', title: 'Даниела Панчетовиќ - За нас почнува живот (DJ Goce Edit)' }
+    { file: '/background-music1.mp3', title: 'Даниела Панчетовиќ - За нас почнува живот (DJ Goce Edit)' },
+    { file: '/background-music.mp3', title: 'ЕБСФ - Денови' }
   ];
 
   const currentTrackTitle = tracks[currentTrackIndex].title;
