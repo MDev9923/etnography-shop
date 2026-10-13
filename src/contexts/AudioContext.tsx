@@ -24,8 +24,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const tracks = [
     { file: '/background-music.mp3', title: 'ЕБСФ - Денови' },
-    { file: '/background-music1.mp3', title: 'Background Music 2' },
-    { file: '/background-music2.mp3', title: 'Background Music 3' },
+    { file: '/background-music1.mp3', title: 'Даниела Панчетовиќ - За нас почнува живот (DJ Goce Edit)' }
   ];
 
   const currentTrackTitle = tracks[currentTrackIndex].title;
