@@ -39,6 +39,9 @@ const API_URL = (
 
 const imageBackground = {
   backgroundImage: "url('/camera-bg.png')",
+  backgroundPosition: 'center',
+  backgroundSize: 'contain',
+  backgroundRepeat: 'no-repeat',
 };
 
 function getImageUrl(value?: string): string {
@@ -275,14 +278,14 @@ export default function ProductPage() {
           <div className="min-w-0 space-y-4">
             {/* Main image */}
             <div
-              className="group relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden bg-cover bg-center bg-no-repeat"
+              className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden"
               style={imageBackground}
             >
               <img
                 key={currentImage}
                 src={currentImage}
                 alt={productName}
-                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8 scale-125 transition-transform duration-300 group-hover:scale-[1.6]"
+                className="absolute inset-0 block w-full h-full object-contain object-center p-6 sm:p-8 scale-125"
                 onError={(event) => {
                   const image = event.currentTarget;
 
@@ -330,10 +333,10 @@ export default function ProductPage() {
                     type="button"
                     key={`${image}-${index}`}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`group relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 bg-white bg-cover bg-center bg-no-repeat transition-colors duration-200 ${
+                    className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 bg-white ${
                       index === safeIndex
                         ? 'border-blue-500'
-                        : 'border-gray-200 hover:border-gray-400'
+                        : 'border-gray-200'
                     }`}
                     style={imageBackground}
                     aria-label={
@@ -346,7 +349,7 @@ export default function ProductPage() {
                     <img
                       src={image}
                       alt={`${productName} ${index + 1}`}
-                      className="block w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-125"
+                      className="block w-full h-full object-contain object-center p-2"
                       onError={(event) => {
                         const thumbnail = event.currentTarget;
 
