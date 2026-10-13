@@ -40,28 +40,41 @@ export function Header() {
 
   return (
     <header className="bg-card border-border border-b sticky top-0 z-50 relative overflow-hidden">
-      {/* Macedonian Pattern Background */}
-      <div className="absolute inset-0 opacity-10">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="100%"
-          height="100%"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="w-full h-full"
+      {/* Background layers */}
+      <div className="absolute inset-0">
+        {/* QR Background - main background */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url(/qr-background.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+        {/* Etnography White - repeating pattern on top */}
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: 'url(/etnography-white.png)',
+            backgroundRepeat: 'repeat-x',
+            backgroundPosition: 'center',
+            backgroundSize: '40rem',
+          }}
         />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <img src="/Logo.png" alt="Etnography Logo" className="h-10 w-10" />
-            <span className="text-xl font-bold text-primary">Etnography</span>
+          <Link href="/" className="flex items-center space-x-3 backdrop-blur-[1px] px-3 py-2 rounded-lg hover:bg-muted transition-colors">
+            <div className="bg-black/30 backdrop-blur-sm rounded-lg p-2 flex items-center space-x-3">
+              <img src="/Logo.png" alt="Etnography Logo" className="h-10 w-10" />
+              <span className="text-xl font-bold text-primary">Etnography</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8 backdrop-blur-[1px]">
             <Link
               href="/"
               className="text-foreground hover:text-primary px-3 py-2 text-sm font-medium transition-colors"
@@ -96,17 +109,17 @@ export function Header() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={getTranslation(language, 'common.search')}
-                className="w-64 pl-10 pr-4 py-2 bg-input border-border border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
+                className="w-64 pl-10 pr-4 py-2 bg-input border-border border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground backdrop-blur-[2px]"
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
             </div>
           </form>
 
           {/* Language, Currency, Music */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4 backdrop-blur-[1px]">
             <button
               onClick={toggleLanguage}
-              className="flex items-center space-x-1 px-3 py-2 text-sm border-border border rounded-lg hover:bg-muted transition-colors text-foreground"
+              className="flex items-center space-x-1 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors text-foreground"
             >
               <Globe className="h-4 w-4" />
               <span>{language.toUpperCase()}</span>
@@ -114,21 +127,21 @@ export function Header() {
 
             <button
               onClick={toggleCurrency}
-              className="flex items-center space-x-1 px-3 py-2 text-sm border-border border rounded-lg hover:bg-muted transition-colors text-foreground"
+              className="flex items-center space-x-1 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors text-foreground"
             >
               <DollarSign className="h-4 w-4" />
               <span>{currency}</span>
             </button>
 
             {/* Music Player */}
-            <div className="flex items-center space-x-2 px-3 py-2 border-border border rounded-lg hover:bg-muted transition-colors">
+            <div className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-muted transition-colors">
               <VinylRecord isPlaying={isPlaying && !isMuted} onClick={toggleMute} size="md" />
               <ScrollingTitle title={currentTrackTitle} width="md" />
             </div>
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className="md:hidden flex items-center gap-2 backdrop-blur-[1px]">
             {/* Compact Music Player - only show vinyl on mobile */}
             <VinylRecord isPlaying={isPlaying && !isMuted} onClick={toggleMute} size="sm" />
 
@@ -144,7 +157,7 @@ export function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden bg-card border-border border-t">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 backdrop-blur-[1px]">
               <Link
                 href="/"
                 className="block px-3 py-2 text-base font-medium text-foreground hover:bg-muted rounded-md transition-colors"
@@ -185,7 +198,7 @@ export function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={getTranslation(language, 'common.search')}
-                    className="w-full pl-10 pr-4 py-2 bg-input border-border border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
+                    className="w-full pl-10 pr-4 py-2 bg-input border-border border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground backdrop-blur-[2px]"
                   />
                   <Search className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>
@@ -194,14 +207,14 @@ export function Header() {
               {/* Mobile Language & Currency */}
               <div className="px-3 py-2 space-y-2">
                 {/* Mobile Music Player */}
-                <div className="flex items-center justify-center space-x-2 px-3 py-2 border-border border rounded-lg bg-muted">
+                <div className="flex items-center justify-center space-x-2 px-3 py-2 rounded-lg bg-muted">
                   <VinylRecord isPlaying={isPlaying && !isMuted} onClick={toggleMute} size="md" />
                   <ScrollingTitle title={currentTrackTitle} width="md" />
                 </div>
 
                 <button
                   onClick={toggleLanguage}
-                  className="w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm border-border border rounded-lg hover:bg-muted transition-colors text-foreground"
+                  className="w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors text-foreground"
                 >
                   <Globe className="h-4 w-4" />
                   <span>{language.toUpperCase()}</span>
@@ -209,7 +222,7 @@ export function Header() {
 
                 <button
                   onClick={toggleCurrency}
-                  className="w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm border-border border rounded-lg hover:bg-muted transition-colors text-foreground"
+                  className="w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm rounded-lg hover:bg-muted transition-colors text-foreground"
                 >
                   <DollarSign className="h-4 w-4" />
                   <span>{currency}</span>
