@@ -18,7 +18,10 @@ import {
 type Product = {
   id: number;
   slug: string;
-  name: { en: string; mk: string };
+  name: {
+    en: string;
+    mk: string;
+  };
   brand: string;
   category: string;
   filmDigital: string;
@@ -27,7 +30,10 @@ type Product = {
   condition: string;
   priceEUR: number | null;
   priceMKD: number | null;
-  description: { en: string; mk: string };
+  description: {
+    en: string;
+    mk: string;
+  };
   specs: Record<string, unknown>;
   images: string[];
   status?: 'available' | 'sold';
@@ -39,7 +45,6 @@ const API_URL = (
 
 const imageBackground = {
   backgroundImage: "url('/camera-bg.png')",
-  backgroundPosition: 'center',
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
 };
@@ -51,6 +56,7 @@ function getImageUrl(value?: string): string {
     return '/placeholder-product.jpg';
   }
 
+  // Repair an API URL accidentally prefixed to a complete image URL.
   while (
     url.startsWith(API_URL) &&
     /^https?:\/\//i.test(url.slice(API_URL.length))
@@ -78,7 +84,9 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const product = allProducts.find((item) => String(item.slug) === slug);
+  const product = allProducts.find(
+    (item) => String(item.slug) === slug
+  );
 
   useEffect(() => {
     let active = true;
@@ -88,7 +96,9 @@ export default function ProductPage() {
         const response = await fetch(`${API_URL}/api/products`);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.status}`);
+          throw new Error(
+            `Failed to fetch products: ${response.status}`
+          );
         }
 
         const data = await response.json();
@@ -104,13 +114,18 @@ export default function ProductPage() {
         console.error('Failed to fetch products:', error);
 
         try {
-          const localProducts = (await import('@/data/products.json')).default;
+          const localProducts = (
+            await import('@/data/products.json')
+          ).default;
 
           if (active) {
             setAllProducts(localProducts as unknown as Product[]);
           }
         } catch (fallbackError) {
-          console.error('Failed to load local products:', fallbackError);
+          console.error(
+            'Failed to load local products:',
+            fallbackError
+          );
         }
       } finally {
         if (active) {
@@ -175,14 +190,19 @@ export default function ProductPage() {
   }
 
   const isSold = product.status === 'sold';
-  const price = currency === 'EUR' ? product.priceEUR : product.priceMKD;
+
+  const price =
+    currency === 'EUR' ? product.priceEUR : product.priceMKD;
+
   const formattedPrice = formatPrice(price ?? 0, currency);
 
   const productName =
     product.name[language] || product.name.en || product.brand;
 
   const description =
-    product.description?.[language] || product.description?.en || '';
+    product.description?.[language] ||
+    product.description?.en ||
+    '';
 
   const conditionText = getTranslation(
     language,
@@ -195,27 +215,38 @@ export default function ProductPage() {
   );
 
   const typeText = product.filmDigital
-    ? getTranslation(language, `catalog.types.${product.filmDigital}`)
+    ? getTranslation(
+        language,
+        `catalog.types.${product.filmDigital}`
+      )
     : '';
 
   const validImages = (product.images || []).filter(
-    (image) => typeof image === 'string' && image.trim().length > 0
+    (image) =>
+      typeof image === 'string' && image.trim().length > 0
   );
 
   const images = validImages.length
     ? validImages.map(getImageUrl)
     : ['/placeholder-product.jpg'];
 
-  const safeIndex = Math.min(currentImageIndex, images.length - 1);
+  const safeIndex = Math.min(
+    currentImageIndex,
+    images.length - 1
+  );
+
   const currentImage = images[safeIndex];
 
   const nextImage = () => {
-    setCurrentImageIndex((previous) => (previous + 1) % images.length);
+    setCurrentImageIndex(
+      (previous) => (previous + 1) % images.length
+    );
   };
 
   const prevImage = () => {
     setCurrentImageIndex(
-      (previous) => (previous - 1 + images.length) % images.length
+      (previous) =>
+        (previous - 1 + images.length) % images.length
     );
   };
 
@@ -228,7 +259,9 @@ export default function ProductPage() {
   };
 
   const handleEmailOrder = () => {
-    const subject = encodeURIComponent(`Order Inquiry - ${productName}`);
+    const subject = encodeURIComponent(
+      `Order Inquiry - ${productName}`
+    );
 
     const body = encodeURIComponent(
       [
@@ -256,7 +289,11 @@ export default function ProductPage() {
       `&su=${subject}` +
       `&body=${body}`;
 
-    window.open(gmailUrl, '_blank', 'noopener,noreferrer');
+    window.open(
+      gmailUrl,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   return (
@@ -270,15 +307,18 @@ export default function ProductPage() {
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-8"
         >
           <ArrowLeft className="h-5 w-5" />
-          <span>{getTranslation(language, 'common.back')}</span>
+
+          <span>
+            {getTranslation(language, 'common.back')}
+          </span>
         </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Image gallery */}
           <div className="min-w-0 space-y-4">
             {/* Main image */}
             <div
-              className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden"
+              className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden bg-[position:center_calc(50%_-_10px)] sm:bg-[position:center_calc(50%_-_20px)]"
               style={imageBackground}
             >
               <img
@@ -289,7 +329,9 @@ export default function ProductPage() {
                 onError={(event) => {
                   const image = event.currentTarget;
 
-                  if (image.dataset.fallbackApplied === 'true') {
+                  if (
+                    image.dataset.fallbackApplied === 'true'
+                  ) {
                     return;
                   }
 
@@ -305,7 +347,9 @@ export default function ProductPage() {
                     onClick={prevImage}
                     className="absolute z-10 left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                     aria-label={
-                      language === 'en' ? 'Previous image' : 'Претходна слика'
+                      language === 'en'
+                        ? 'Previous image'
+                        : 'Претходна слика'
                     }
                   >
                     <ChevronLeft className="h-6 w-6 text-gray-800" />
@@ -316,7 +360,9 @@ export default function ProductPage() {
                     onClick={nextImage}
                     className="absolute z-10 right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                     aria-label={
-                      language === 'en' ? 'Next image' : 'Следна слика'
+                      language === 'en'
+                        ? 'Next image'
+                        : 'Следна слика'
                     }
                   >
                     <ChevronRight className="h-6 w-6 text-gray-800" />
@@ -332,8 +378,10 @@ export default function ProductPage() {
                   <button
                     type="button"
                     key={`${image}-${index}`}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 bg-white ${
+                    onClick={() =>
+                      setCurrentImageIndex(index)
+                    }
+                    className={`relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 bg-white bg-center ${
                       index === safeIndex
                         ? 'border-blue-500'
                         : 'border-gray-200'
@@ -351,14 +399,20 @@ export default function ProductPage() {
                       alt={`${productName} ${index + 1}`}
                       className="block w-full h-full object-contain object-center p-2"
                       onError={(event) => {
-                        const thumbnail = event.currentTarget;
+                        const thumbnail =
+                          event.currentTarget;
 
-                        if (thumbnail.dataset.fallbackApplied === 'true') {
+                        if (
+                          thumbnail.dataset
+                            .fallbackApplied === 'true'
+                        ) {
                           return;
                         }
 
-                        thumbnail.dataset.fallbackApplied = 'true';
-                        thumbnail.src = '/placeholder-product.jpg';
+                        thumbnail.dataset.fallbackApplied =
+                          'true';
+                        thumbnail.src =
+                          '/placeholder-product.jpg';
                       }}
                     />
                   </button>
@@ -383,7 +437,10 @@ export default function ProductPage() {
 
                 {typeText && (
                   <>
-                    <span className="text-gray-300">•</span>
+                    <span className="text-gray-300">
+                      •
+                    </span>
+
                     <span className="text-sm text-gray-500">
                       {typeText}
                     </span>
@@ -391,7 +448,7 @@ export default function ProductPage() {
                 )}
               </div>
 
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
                 {productName}
               </h1>
 
@@ -400,7 +457,7 @@ export default function ProductPage() {
                   {formattedPrice}
                 </span>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center flex-wrap gap-2">
                   <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
                     {conditionText}
                   </span>
@@ -426,7 +483,10 @@ export default function ProductPage() {
 
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {getTranslation(language, 'product.description')}
+                {getTranslation(
+                  language,
+                  'product.description'
+                )}
               </h3>
 
               <p className="text-gray-600 leading-relaxed">
@@ -436,18 +496,28 @@ export default function ProductPage() {
 
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {getTranslation(language, 'product.specifications')}
+                {getTranslation(
+                  language,
+                  'product.specifications'
+                )}
               </h3>
 
-              <div className="bg-gray-50 rounded-lg p-6">
+              <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
                 <dl className="space-y-3">
-                  {Object.entries(product.specs ?? {}).map(([key, value]) => (
-                    <div key={key} className="flex justify-between gap-4">
-                      <dt className="text-sm font-medium text-gray-500 capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                  {Object.entries(
+                    product.specs ?? {}
+                  ).map(([key, value]) => (
+                    <div
+                      key={key}
+                      className="flex justify-between gap-4"
+                    >
+                      <dt className="min-w-0 text-sm font-medium text-gray-500 capitalize break-words">
+                        {key
+                          .replace(/([A-Z])/g, ' $1')
+                          .trim()}
                       </dt>
 
-                      <dd className="text-sm text-gray-900 font-medium text-right">
+                      <dd className="min-w-0 text-sm text-gray-900 font-medium text-right break-words">
                         {String(value)}
                       </dd>
                     </div>
@@ -455,7 +525,10 @@ export default function ProductPage() {
 
                   <div className="flex justify-between pt-3 border-t border-gray-200 gap-4">
                     <dt className="text-sm font-medium text-gray-500">
-                      {getTranslation(language, 'product.condition')}
+                      {getTranslation(
+                        language,
+                        'product.condition'
+                      )}
                     </dt>
 
                     <dd className="text-sm text-gray-900 font-medium text-right">
