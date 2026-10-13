@@ -1,59 +1,101 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ScrollingTitleProps {
   title: string;
   width?: 'sm' | 'md' | 'lg';
 }
 
-export function ScrollingTitle({ title, width = 'md' }: ScrollingTitleProps) {
-  const [position, setPosition] = useState(0);
+export function ScrollingTitle({ title }: ScrollingTitleProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLSpanElement>(null);
+  const measurementRef = useRef<HTMLSpanElement>(null);
 
-  const widthClasses = {
-    sm: 'w-20',
-    md: 'w-32',
-    lg: 'w-48',
-  };
+  const [textWidth, setTextWidth] = useState(0);
+  const [availableWidth, setAvailableWidth] = useState(0);
+
+  const gap = 32;
+  const speed = 25; // Pixels per second.
 
   useEffect(() => {
     const container = containerRef.current;
-    const text = textRef.current;
-    if (!container || !text) return;
+    const text = measurementRef.current;
+    const parent = container?.parentElement;
 
-    const containerWidth = container.offsetWidth;
-    const textWidth = text.offsetWidth;
+    if (!container || !text || !parent) return;
 
-    if (textWidth <= containerWidth) {
-      setPosition(0);
-      return;
-    }
-
-    const animate = () => {
-      setPosition((prev) => {
-        const next = prev - 0.5;
-        if (next < -textWidth) {
-          return containerWidth;
-        }
-        return next;
-      });
+    const measure = () => {
+      setTextWidth(text.getBoundingClientRect().width);
+      setAvailableWidth(parent.clientWidth);
     };
 
-    const interval = setInterval(animate, 30);
-    return () => clearInterval(interval);
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(parent);
+    observer.observe(text);
+
+    return () => observer.disconnect();
   }, [title]);
 
+  const windowWidth = Math.min(
+    availableWidth,
+    Math.max(1, textWidth - 24)
+  );
+
+  const distance = textWidth + gap;
+  const duration = distance / speed;
+
   return (
-    <div ref={containerRef} className={`${widthClasses[width]} overflow-hidden whitespace-nowrap`}>
+    <div
+      ref={containerRef}
+      className="relative min-w-0 max-w-full overflow-hidden whitespace-nowrap text-xs text-white"
+      style={{
+        width: windowWidth > 0 ? windowWidth : '100%',
+      }}
+      aria-label={title}
+    >
+      {/* Measure the complete title without displaying it. */}
       <span
-        ref={textRef}
-        className="inline-block text-xs text-foreground transition-transform"
-        style={{ transform: `translateX(${position}px)` }}
+        ref={measurementRef}
+        aria-hidden="true"
+        className="pointer-events-none invisible absolute left-0 top-0 inline-block whitespace-nowrap"
       >
         {title}
       </span>
+
+      {textWidth > 0 && (
+        <div
+          key={title}
+          aria-hidden="true"
+          className="song-title-track flex w-max items-center"
+          style={{
+            gap,
+            animationDuration: `${duration}s`,
+          }}
+        >
+          <span className="block shrink-0">{title}</span>
+          <span className="block shrink-0">{title}</span>
+        </div>
+      )}
+
+      <style jsx>{`
+        .song-title-track {
+          animation-name: song-title-scroll;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          will-change: transform;
+        }
+
+        @keyframes song-title-scroll {
+          from {
+            transform: translateX(-${distance}px);
+          }
+          to {
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

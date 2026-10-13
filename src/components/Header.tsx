@@ -58,6 +58,9 @@ export function Header() {
     'transition-colors hover:bg-white/15 ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
 
+const titleClass =
+  'min-w-0 flex-1 overflow-hidden text-white';
+
   const searchField = (
     <div className="relative">
       <Search
@@ -124,7 +127,9 @@ export function Header() {
 
           {/* Desktop navigation */}
           <nav
-            aria-label={language === 'mk' ? 'Главна навигација' : 'Main navigation'}
+            aria-label={
+              language === 'mk' ? 'Главна навигација' : 'Main navigation'
+            }
             className="hidden shrink-0 items-center gap-1 xl:flex"
           >
             {navigation.map((item) => (
@@ -153,7 +158,9 @@ export function Header() {
               type="button"
               onClick={toggleLanguage}
               aria-label={
-                language === 'mk' ? 'Switch to English' : 'Промени на македонски'
+                language === 'mk'
+                  ? 'Switch to English'
+                  : 'Промени на македонски'
               }
               className={controlClass}
             >
@@ -173,8 +180,8 @@ export function Header() {
               <span>{currency}</span>
             </button>
 
-            {/* Keep the track title from expanding the header */}
-            <div className="ml-1 flex w-44 min-w-0 items-center gap-2 border-l border-white/15 pl-3">
+            {/* Desktop music player: 352px instead of 176px */}
+            <div className="ml-1 flex w-[22rem] min-w-0 items-center gap-2 border-l border-white/15 pl-3">
               <div className="shrink-0">
                 <VinylRecord
                   isPlaying={isPlaying && !isMuted}
@@ -183,7 +190,7 @@ export function Header() {
                 />
               </div>
 
-              <div className="min-w-0 flex-1 overflow-hidden text-white">
+              <div className={titleClass}>
                 <ScrollingTitle title={currentTrackTitle} width="sm" />
               </div>
             </div>
@@ -254,6 +261,11 @@ export function Header() {
               <button
                 type="button"
                 onClick={toggleLanguage}
+                aria-label={
+                  language === 'mk'
+                    ? 'Switch to English'
+                    : 'Промени на македонски'
+                }
                 className={`${controlClass} flex-1`}
               >
                 <Globe aria-hidden="true" className="h-4 w-4" />
@@ -263,6 +275,9 @@ export function Header() {
               <button
                 type="button"
                 onClick={toggleCurrency}
+                aria-label={
+                  language === 'mk' ? 'Промени валута' : 'Change currency'
+                }
                 className={`${controlClass} flex-1`}
               >
                 <DollarSign aria-hidden="true" className="h-4 w-4" />
@@ -270,7 +285,8 @@ export function Header() {
               </button>
             </div>
 
-            <div className="mt-3 flex items-center gap-3 rounded-lg border border-white/15 bg-black/30 px-3 py-2">
+            {/* Mobile music player: title fills the remaining width */}
+            <div className="mt-3 flex w-full min-w-0 items-center gap-3 rounded-lg border border-white/15 bg-black/30 px-3 py-2">
               <div className="shrink-0">
                 <VinylRecord
                   isPlaying={isPlaying && !isMuted}
@@ -279,7 +295,7 @@ export function Header() {
                 />
               </div>
 
-              <div className="min-w-0 flex-1 overflow-hidden text-white">
+              <div className={titleClass}>
                 <ScrollingTitle title={currentTrackTitle} width="sm" />
               </div>
             </div>
