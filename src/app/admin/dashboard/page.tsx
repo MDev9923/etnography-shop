@@ -821,12 +821,10 @@ export default function AdminDashboard() {
                     <div className="bg-orange-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600">Матеј Вкупно</p>
                       <p className="text-lg font-bold text-black">{financialSummary.summary.matejTotalMKD.toFixed(0)} ден</p>
-                      <p className="text-xs text-gray-500">(Трошоци: {financialSummary.summary.matejExpensesMKD?.toFixed(0) || 0} ден)</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg">
                       <p className="text-sm text-gray-600">Гого Вкупно</p>
                       <p className="text-lg font-bold text-black">{financialSummary.summary.gogoTotalMKD.toFixed(0)} ден</p>
-                      <p className="text-xs text-gray-500">(Трошоци: {financialSummary.summary.gogoExpensesMKD?.toFixed(0) || 0} ден)</p>
                     </div>
                   </div>
                 </div>
