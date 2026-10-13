@@ -8,20 +8,32 @@ interface AudioContextType {
   toggleMute: () => void;
   isMuted: boolean;
   setIsMuted: (muted: boolean) => void;
+  currentTrackIndex: number;
+  currentTrackTitle: string;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export function AudioProvider({ children }: { children: React.ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wasPlayingRef = useRef(false);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
+  const tracks = [
+    { file: '/background-music.mp3', title: 'ЕБСФ - Денови' },
+    { file: '/background-music1.mp3', title: 'Background Music 2' },
+    { file: '/background-music2.mp3', title: 'Background Music 3' },
+  ];
+
+  const currentTrackTitle = tracks[currentTrackIndex].title;
 
   // Create the audio once (on mount)
   useEffect(() => {
-    const audio = new Audio('/background-music.mp3');
-    audio.loop = true;
+    const audio = new Audio(tracks[currentTrackIndex].file);
+    audio.loop = false;
     audio.preload = 'auto';
     audio.volume = 0.35;
 
@@ -29,10 +41,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     audio.muted = true;
     audioRef.current = audio;
 
-    // Don't auto-play - user must explicitly enable music
+    // Handle track end to play next track
+    const handleEnded = () => {
+      wasPlayingRef.current = true;
+      setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+    };
+
+    audio.addEventListener('ended', handleEnded);
 
     return () => {
       audio.pause();
+      audio.removeEventListener('ended', handleEnded);
       audioRef.current = null;
     };
   }, []);
@@ -43,6 +62,22 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (!audio) return;
     audio.muted = isMuted;
   }, [isMuted]);
+
+  // Load new track when index changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const shouldAutoPlay = wasPlayingRef.current;
+    wasPlayingRef.current = false;
+
+    audio.src = tracks[currentTrackIndex].file;
+    audio.load();
+
+    if (shouldAutoPlay) {
+      audio.play().catch(() => setIsPlaying(false));
+    }
+  }, [currentTrackIndex]);
 
   const toggleMute = async () => {
     const audio = audioRef.current;
@@ -72,8 +107,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       toggleMute,
       isMuted,
       setIsMuted,
+      currentTrackIndex,
+      currentTrackTitle,
     }),
-    [isPlaying, isMuted]
+    [isPlaying, isMuted, currentTrackIndex, currentTrackTitle]
   );
 
   return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;

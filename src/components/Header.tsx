@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation';
 import { getTranslation } from '@/lib/i18n';
 import { useApp } from '@/lib/context';
 import { useAudio } from '@/contexts/AudioContext';
-import { Search, Menu, X, Globe, DollarSign, Volume2, VolumeX } from 'lucide-react';
+import { Search, Menu, X, Globe, DollarSign } from 'lucide-react';
+import { VinylRecord } from './VinylRecord';
+import { ScrollingTitle } from './ScrollingTitle';
 
 export function Header() {
   const { language, currency, setLanguage, setCurrency } = useApp();
@@ -14,7 +16,7 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { isMuted, toggleMute, isPlaying } = useAudio();
+  const { isMuted, toggleMute, isPlaying, currentTrackTitle } = useAudio();
 
   const toggleLanguage = () => {
     const newLang = language === 'en' ? 'mk' : 'en';
@@ -118,34 +120,17 @@ export function Header() {
               <span>{currency}</span>
             </button>
 
-            <button
-              onClick={toggleMute}
-              className="flex items-center space-x-1 px-3 py-2 text-sm border-border border rounded-lg hover:bg-muted transition-colors text-foreground"
-              aria-label={isMuted ? 'Unmute music' : 'Mute music'}
-              title={isMuted ? 'Unmute music' : 'Mute music'}
-            >
-              {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-              <span className="hidden lg:inline">
-                {isMuted
-                  ? language === 'en'
-                    ? 'Music Off'
-                    : 'Музика Искл.'
-                  : language === 'en'
-                    ? 'Music On'
-                    : 'Музика Вкл.'}
-              </span>
-            </button>
+            {/* Music Player */}
+            <div className="flex items-center space-x-2 px-3 py-2 border-border border rounded-lg hover:bg-muted transition-colors">
+              <VinylRecord isPlaying={isPlaying && !isMuted} onClick={toggleMute} size="md" />
+              <ScrollingTitle title={currentTrackTitle} width="md" />
+            </div>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
-            <button
-              onClick={toggleMute}
-              className="p-2 rounded-md text-foreground hover:bg-muted transition-colors"
-              aria-label={isMuted ? 'Unmute music' : 'Mute music'}
-            >
-              {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
-            </button>
+            {/* Compact Music Player - only show vinyl on mobile */}
+            <VinylRecord isPlaying={isPlaying && !isMuted} onClick={toggleMute} size="sm" />
 
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -208,6 +193,12 @@ export function Header() {
 
               {/* Mobile Language & Currency */}
               <div className="px-3 py-2 space-y-2">
+                {/* Mobile Music Player */}
+                <div className="flex items-center justify-center space-x-2 px-3 py-2 border-border border rounded-lg bg-muted">
+                  <VinylRecord isPlaying={isPlaying && !isMuted} onClick={toggleMute} size="md" />
+                  <ScrollingTitle title={currentTrackTitle} width="md" />
+                </div>
+
                 <button
                   onClick={toggleLanguage}
                   className="w-full flex items-center justify-center space-x-1 px-3 py-2 text-sm border-border border rounded-lg hover:bg-muted transition-colors text-foreground"
@@ -223,15 +214,6 @@ export function Header() {
                   <DollarSign className="h-4 w-4" />
                   <span>{currency}</span>
                 </button>
-
-                {/* Hint if autoplay was blocked */}
-                {!isPlaying && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    {language === 'en'
-                      ? 'Tap once to enable music (some browsers block autoplay).'
-                      : 'Кликни еднаш за музика (некои прелистувачи блокираат autoplay).'}
-                  </p>
-                )}
               </div>
             </div>
           </div>
