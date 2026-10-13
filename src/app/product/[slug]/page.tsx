@@ -37,27 +37,30 @@ const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
 ).replace(/\/+$/, '');
 
-function getImageUrl(image: string): string {
-  let url = image.trim();
+const imageBackground = {
+  backgroundImage: "url('/camera-bg.png')",
+};
 
-  if (url.startsWith(API_URL)) {
-    const remainder = url.slice(API_URL.length);
+function getImageUrl(value?: string): string {
+  let url = value?.trim() || '';
 
-    if (/^https?:\/\//i.test(remainder)) {
-      url = remainder;
-    }
+  if (!url) {
+    return '/placeholder-product.jpg';
+  }
+
+  while (
+    url.startsWith(API_URL) &&
+    /^https?:\/\//i.test(url.slice(API_URL.length))
+  ) {
+    url = url.slice(API_URL.length);
   }
 
   if (/^https?:\/\//i.test(url)) {
     return url;
   }
 
-  if (url.startsWith('/uploads/')) {
-    return `${API_URL}${url}`;
-  }
-
-  if (url.startsWith('uploads/')) {
-    return `${API_URL}/${url}`;
+  if (url.startsWith('/uploads/') || url.startsWith('uploads/')) {
+    return `${API_URL}/${url.replace(/^\/+/, '')}`;
   }
 
   return url;
@@ -128,6 +131,7 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
+
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <p className="text-center text-gray-900">
             {language === 'en'
@@ -135,6 +139,7 @@ export default function ProductPage() {
               : 'Се вчитува производот...'}
           </p>
         </main>
+
         <Footer />
       </div>
     );
@@ -144,6 +149,7 @@ export default function ProductPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
+
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
@@ -151,6 +157,7 @@ export default function ProductPage() {
                 ? 'Product Not Found'
                 : 'Производот не е пронајден'}
             </h1>
+
             <p className="text-gray-600">
               {language === 'en'
                 ? 'The product you are looking for does not exist.'
@@ -158,6 +165,7 @@ export default function ProductPage() {
             </p>
           </div>
         </main>
+
         <Footer />
       </div>
     );
@@ -166,7 +174,10 @@ export default function ProductPage() {
   const isSold = product.status === 'sold';
   const price = currency === 'EUR' ? product.priceEUR : product.priceMKD;
   const formattedPrice = formatPrice(price ?? 0, currency);
-  const productName = product.name[language] || product.name.en;
+
+  const productName =
+    product.name[language] || product.name.en || product.brand;
+
   const description =
     product.description?.[language] || product.description?.en || '';
 
@@ -262,14 +273,26 @@ export default function ProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Image gallery */}
           <div className="min-w-0 space-y-4">
+            {/* Main image */}
             <div
-              className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: "url('/camera-bg.png')" }}
+              className="group relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden bg-cover bg-center bg-no-repeat"
+              style={imageBackground}
             >
               <img
+                key={currentImage}
                 src={currentImage}
                 alt={productName}
-                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8 scale-125"
+                className="absolute inset-0 block w-full h-full object-contain p-6 sm:p-8 scale-125 transition-transform duration-300 group-hover:scale-[1.6]"
+                onError={(event) => {
+                  const image = event.currentTarget;
+
+                  if (image.dataset.fallbackApplied === 'true') {
+                    return;
+                  }
+
+                  image.dataset.fallbackApplied = 'true';
+                  image.src = '/placeholder-product.jpg';
+                }}
               />
 
               {images.length > 1 && (
@@ -277,7 +300,7 @@ export default function ProductPage() {
                   <button
                     type="button"
                     onClick={prevImage}
-                    className="absolute z-10 left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
+                    className="absolute z-10 left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                     aria-label={
                       language === 'en' ? 'Previous image' : 'Претходна слика'
                     }
@@ -288,7 +311,7 @@ export default function ProductPage() {
                   <button
                     type="button"
                     onClick={nextImage}
-                    className="absolute z-10 right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-all"
+                    className="absolute z-10 right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow-sm hover:bg-white transition-colors"
                     aria-label={
                       language === 'en' ? 'Next image' : 'Следна слика'
                     }
@@ -299,6 +322,7 @@ export default function ProductPage() {
               )}
             </div>
 
+            {/* Bottom thumbnails */}
             {images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-2">
                 {images.map((image, index) => (
@@ -306,11 +330,12 @@ export default function ProductPage() {
                     type="button"
                     key={`${image}-${index}`}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 bg-white rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`group relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 bg-white bg-cover bg-center bg-no-repeat transition-colors duration-200 ${
                       index === safeIndex
-                        ? 'border-blue-500 opacity-100'
-                        : 'border-gray-200 opacity-70 hover:opacity-100'
+                        ? 'border-blue-500'
+                        : 'border-gray-200 hover:border-gray-400'
                     }`}
+                    style={imageBackground}
                     aria-label={
                       language === 'en'
                         ? `View image ${index + 1}`
@@ -321,7 +346,17 @@ export default function ProductPage() {
                     <img
                       src={image}
                       alt={`${productName} ${index + 1}`}
-                      className="block w-full h-full object-contain p-2"
+                      className="block w-full h-full object-contain p-2 transition-transform duration-300 group-hover:scale-125"
+                      onError={(event) => {
+                        const thumbnail = event.currentTarget;
+
+                        if (thumbnail.dataset.fallbackApplied === 'true') {
+                          return;
+                        }
+
+                        thumbnail.dataset.fallbackApplied = 'true';
+                        thumbnail.src = '/placeholder-product.jpg';
+                      }}
                     />
                   </button>
                 ))}
@@ -333,14 +368,22 @@ export default function ProductPage() {
           <div className="min-w-0 space-y-6">
             <div>
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-2">
-                <span className="text-sm text-gray-500">{product.brand}</span>
+                <span className="text-sm text-gray-500">
+                  {product.brand}
+                </span>
+
                 <span className="text-gray-300">•</span>
-                <span className="text-sm text-gray-500">{categoryText}</span>
+
+                <span className="text-sm text-gray-500">
+                  {categoryText}
+                </span>
 
                 {typeText && (
                   <>
                     <span className="text-gray-300">•</span>
-                    <span className="text-sm text-gray-500">{typeText}</span>
+                    <span className="text-sm text-gray-500">
+                      {typeText}
+                    </span>
                   </>
                 )}
               </div>
@@ -382,7 +425,10 @@ export default function ProductPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {getTranslation(language, 'product.description')}
               </h3>
-              <p className="text-gray-600 leading-relaxed">{description}</p>
+
+              <p className="text-gray-600 leading-relaxed">
+                {description}
+              </p>
             </div>
 
             <div>
@@ -397,6 +443,7 @@ export default function ProductPage() {
                       <dt className="text-sm font-medium text-gray-500 capitalize">
                         {key.replace(/([A-Z])/g, ' $1').trim()}
                       </dt>
+
                       <dd className="text-sm text-gray-900 font-medium text-right">
                         {String(value)}
                       </dd>
@@ -407,6 +454,7 @@ export default function ProductPage() {
                     <dt className="text-sm font-medium text-gray-500">
                       {getTranslation(language, 'product.condition')}
                     </dt>
+
                     <dd className="text-sm text-gray-900 font-medium text-right">
                       {conditionText}
                     </dd>
@@ -427,6 +475,7 @@ export default function ProductPage() {
                 }`}
               >
                 <Instagram className="h-5 w-5" />
+
                 <span>
                   {isSold
                     ? language === 'en'
@@ -444,6 +493,7 @@ export default function ProductPage() {
                 className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
               >
                 <Mail className="h-5 w-5" />
+
                 <span>
                   {language === 'en'
                     ? 'Email for Order'

@@ -89,7 +89,7 @@ export function ProductCard({
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
       <Link href={productUrl} className="block">
         <div
-          className="relative aspect-[4/3] bg-white overflow-hidden bg-cover bg-center bg-no-repeat"
+          className="group relative aspect-[4/3] bg-white overflow-hidden bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('/camera-bg.png')",
           }}
@@ -99,9 +99,9 @@ export function ProductCard({
             src={imageUrl}
             alt={productName}
             loading="lazy"
-            className="absolute inset-0 w-full h-full object-contain p-2"
-            onError={(e) => {
-              const image = e.currentTarget;
+            className="absolute inset-0 w-full h-full object-contain p-2 transition-transform duration-300 ease-out group-hover:scale-110"
+            onError={(event) => {
+              const image = event.currentTarget;
 
               if (image.dataset.fallbackApplied === 'true') {
                 return;
@@ -130,7 +130,7 @@ export function ProductCard({
         </div>
       </Link>
 
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-2 flex flex-col flex-1">
         <div className="mb-2">
           <span className="text-sm text-gray-500">
             {product.brand}
@@ -161,6 +161,7 @@ export function ProductCard({
           className="mt-auto w-full bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
         >
           <Eye className="h-4 w-4" />
+
           <span>
             {getTranslation(language, 'common.viewDetails')}
           </span>
