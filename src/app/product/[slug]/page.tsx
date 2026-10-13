@@ -318,7 +318,7 @@ export default function ProductPage() {
           <div className="min-w-0 space-y-4">
             {/* Main image */}
             <div
-              className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden bg-[position:center_calc(50%_-_10px)] sm:bg-[position:center_calc(50%_-_20px)]"
+              className="relative aspect-square w-full bg-white rounded-lg border border-gray-200 overflow-hidden bg-[position:center_calc(50%_-_15px)] sm:bg-[position:center_calc(50%_-_20px)]"
               style={imageBackground}
             >
               <img
