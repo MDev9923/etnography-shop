@@ -489,7 +489,7 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-                {productName}
+                {product.brand} • {productName}
               </h1>
 
               <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
