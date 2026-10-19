@@ -6,7 +6,7 @@ export function cn(...inputs: any[]) {
 
 export function formatPrice(price: number, currency: Currency): string {
   if (currency === 'EUR') {
-    return `€${price.toLocaleString()}`;
+    return `€${Math.round(price).toLocaleString()}`;
   } else {
     return `${price.toLocaleString()} MKD`;
   }

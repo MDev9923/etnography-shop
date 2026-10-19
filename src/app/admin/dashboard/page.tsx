@@ -1127,7 +1127,7 @@ export default function AdminDashboard() {
 
                     <td className="px-4 py-3 text-gray-900">
                       {product.priceEUR != null
-                        ? `€${product.priceEUR}`
+                        ? `€${Math.round(product.priceEUR)}`
                         : '—'}
                     </td>
 
@@ -1405,7 +1405,7 @@ export default function AdminDashboard() {
                         price_eur:
                           value === ''
                             ? ''
-                            : (Number(value) / 62).toFixed(2),
+                            : Math.round(Number(value) / 62).toString(),
                       }));
                     }}
                     className={`${inputClass} mt-1`}
