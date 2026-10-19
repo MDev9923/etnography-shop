@@ -234,7 +234,7 @@ export const translations: Record<Language, Translation> = {
       conditions: {
         likeNew: 'Како Ново',
         excellent: 'Одлично',
-        'very-good': 'Многу Добро',
+        'very-good': 'Многу Добра',
         good: 'Добро',
         low: 'Слабо'
       }
@@ -257,10 +257,10 @@ export const translations: Record<Language, Translation> = {
       filmFormat: 'Формат на филм',
       accessories: {
         'memory-card': 'Мемориска картичка',
-        'case': 'Куферче',
+        'case': 'Футрола',
         'flash': 'Блиц',
         'data-cable': 'Кабел за пренос на податоци',
-        'charger': 'Полнител',
+        'charger': 'Полнач',
         'battery': 'Батерија/и',
         'strap': 'Каиш',
         'film': 'Филм',

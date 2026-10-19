@@ -185,10 +185,10 @@ const filmTypes = [
 
 const accessoryTypes = [
   { id: 'memory-card', name_en: 'Memory card', name_mk: 'Мемориска картичка' },
-  { id: 'case', name_en: 'Case', name_mk: 'Куферче' },
+  { id: 'case', name_en: 'Case', name_mk: 'Футрола' },
   { id: 'flash', name_en: 'Flash', name_mk: 'Блиц' },
   { id: 'data-cable', name_en: 'Data transfer cable', name_mk: 'Кабел за пренос на податоци' },
-  { id: 'charger', name_en: 'Charger', name_mk: 'Полнител' },
+  { id: 'charger', name_en: 'Charger', name_mk: 'Полнач' },
   { id: 'battery', name_en: 'Battery / batteries', name_mk: 'Батерија/и' },
   { id: 'strap', name_en: 'Strap', name_mk: 'Каиш' },
   { id: 'film', name_en: 'Film', name_mk: 'Филм' },
@@ -1661,7 +1661,7 @@ export default function AdminDashboard() {
 
               {/* Included Accessories Section */}
               <div className="border-t pt-4 mt-4">
-                <h3 className="text-lg font-semibold mb-4">Included Accessories</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-900">Included Accessories</h3>
 
                 <div className="space-y-3">
                   {accessoryTypes.map((accessory) => {
