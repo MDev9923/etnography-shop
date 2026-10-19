@@ -26,6 +26,13 @@ export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const musicIsActive = isPlaying && !isMuted;
+
+  const musicHint =
+    language === 'mk'
+      ? 'Притисни за пуштање/пауза'
+      : 'Press to play/pause';
+
   const toggleLanguage = () => {
     const newLanguage = language === 'en' ? 'mk' : 'en';
 
@@ -57,9 +64,6 @@ export function Header() {
     'text-sm font-medium text-white whitespace-nowrap ' +
     'transition-colors hover:bg-white/15 ' +
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary';
-
-const titleClass =
-  'min-w-0 flex-1 overflow-hidden text-white';
 
   const searchField = (
     <div className="relative">
@@ -107,20 +111,20 @@ const titleClass =
       </div>
 
       <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
-        <div className="flex min-h-[72px] items-center gap-3 xl:gap-5">
+        <div className="flex min-h-[72px] items-center gap-2 sm:gap-3 xl:gap-5">
           {/* Logo */}
           <Link
             href="/"
             onClick={() => setIsMenuOpen(false)}
-            className="flex shrink-0 items-center gap-2 rounded-lg px-1 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="flex shrink-0 items-center gap-1.5 rounded-lg py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:gap-2 sm:px-1"
           >
             <img
               src="/Logo.png"
               alt=""
-              className="h-10 w-10 shrink-0 object-contain"
+              className="h-8 w-8 shrink-0 object-contain sm:h-10 sm:w-10"
             />
 
-            <span className="whitespace-nowrap text-lg font-bold text-primary sm:text-xl">
+            <span className="whitespace-nowrap text-sm font-bold text-primary sm:text-xl">
               Etnography
             </span>
           </Link>
@@ -180,29 +184,63 @@ const titleClass =
               <span>{currency}</span>
             </button>
 
-            {/* Desktop music player: 352px instead of 176px */}
+            {/* Desktop music player */}
             <div className="ml-1 flex w-[22rem] min-w-0 items-center gap-2 border-l border-white/15 pl-3">
               <div className="shrink-0">
                 <VinylRecord
-                  isPlaying={isPlaying && !isMuted}
+                  isPlaying={musicIsActive}
                   onClick={toggleMute}
                   size="md"
                 />
               </div>
 
-              <div className={titleClass}>
-                <ScrollingTitle title={currentTrackTitle} width="sm" />
+              <div className="min-w-0 flex-1 overflow-hidden text-white">
+                {musicIsActive ? (
+                  <ScrollingTitle title={currentTrackTitle} width="sm" />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    className="rounded text-left text-sm leading-snug hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    {musicHint}
+                  </button>
+                )}
               </div>
             </div>
           </div>
 
           {/* Mobile and tablet controls */}
-          <div className="ml-auto flex shrink-0 items-center gap-3 xl:hidden">
-            <VinylRecord
-              isPlaying={isPlaying && !isMuted}
-              onClick={toggleMute}
-              size="sm"
-            />
+          <div className="ml-auto flex min-w-0 flex-1 items-center justify-end gap-2 xl:hidden">
+            {/* Music text stays visible with the menu closed */}
+            <div className="flex min-w-0 w-full max-w-[180px] items-center gap-2">
+              <div className="shrink-0">
+                <VinylRecord
+                  isPlaying={musicIsActive}
+                  onClick={toggleMute}
+                  size="sm"
+                />
+              </div>
+
+              <div className="min-w-0 flex-1 overflow-hidden text-white">
+                {musicIsActive ? (
+                  <div className="[&>*]:!w-full [&>*]:!max-w-full">
+                    <ScrollingTitle
+                      title={currentTrackTitle}
+                      width="sm"
+                    />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={toggleMute}
+                    className="block rounded text-left text-[10px] leading-tight hover:text-white/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:text-xs"
+                  >
+                    {musicHint}
+                  </button>
+                )}
+              </div>
+            </div>
 
             <button
               type="button"
@@ -218,7 +256,7 @@ const titleClass =
                     ? 'Close menu'
                     : 'Open menu'
               }
-              className="rounded-lg border border-white/15 bg-black/30 p-2 text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="shrink-0 rounded-lg border border-white/15 bg-black/30 p-2 text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
@@ -283,21 +321,6 @@ const titleClass =
                 <DollarSign aria-hidden="true" className="h-4 w-4" />
                 <span>{currency}</span>
               </button>
-            </div>
-
-            {/* Mobile music player: title fills the remaining width */}
-            <div className="mt-3 flex w-full min-w-0 items-center gap-3 rounded-lg border border-white/15 bg-black/30 px-3 py-2">
-              <div className="shrink-0">
-                <VinylRecord
-                  isPlaying={isPlaying && !isMuted}
-                  onClick={toggleMute}
-                  size="sm"
-                />
-              </div>
-
-              <div className={titleClass}>
-                <ScrollingTitle title={currentTrackTitle} width="sm" />
-              </div>
             </div>
           </div>
         )}
