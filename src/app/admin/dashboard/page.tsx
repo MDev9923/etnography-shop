@@ -68,6 +68,21 @@ interface Product {
   purchased_by_note?: string | null;
   general_note?: string | null;
   visible_in_catalog?: number;
+
+  // Camera specifications
+  megapixels?: string | null;
+  batteryType?: string | null;
+  memoryType?: string | null;
+  maxMemoryCapacity?: string | null;
+  internalMemory?: string | null;
+
+  // Included accessories
+  includedAccessories?: Array<{
+    id: string;
+    name_en: string;
+    name_mk: string;
+    detail: string;
+  }>;
 }
 
 interface ProductForm {
@@ -96,6 +111,19 @@ interface ProductForm {
   purchased_by_note: string;
   general_note: string;
   visible_in_catalog: boolean;
+  // Camera specifications
+  megapixels: string;
+  battery_type: string;
+  memory_type: string;
+  max_memory_capacity: string;
+  internal_memory: string;
+  // Included accessories
+  included_accessories: Array<{
+    id: string;
+    name_en: string;
+    name_mk: string;
+    detail: string;
+  }>;
 }
 
 function createEmptyForm(): ProductForm {
@@ -123,7 +151,13 @@ function createEmptyForm(): ProductForm {
     purchased_by: '',
     purchased_by_note: '',
     general_note: '',
-    visible_in_catalog: true
+    visible_in_catalog: true,
+    megapixels: '',
+    battery_type: '',
+    memory_type: '',
+    max_memory_capacity: '',
+    internal_memory: '',
+    included_accessories: []
   };
 }
 
@@ -141,6 +175,24 @@ const filmTypes = [
   ['aps', 'APS'],
   ['110', '110'],
   ['disc', 'Disc'],
+  ['polaroid-sx70', 'Polaroid SX-70'],
+  ['polaroid-600', 'Polaroid 600'],
+  ['polaroid-itype', 'Polaroid i-Type'],
+  ['instax-mini', 'Instax Mini'],
+  ['instax-square', 'Instax Square'],
+  ['instax-wide', 'Instax Wide'],
+];
+
+const accessoryTypes = [
+  { id: 'memory-card', name_en: 'Memory card', name_mk: 'Мемориска картичка' },
+  { id: 'case', name_en: 'Case', name_mk: 'Куферче' },
+  { id: 'flash', name_en: 'Flash', name_mk: 'Блиц' },
+  { id: 'data-cable', name_en: 'Data transfer cable', name_mk: 'Кабел за пренос на податоци' },
+  { id: 'charger', name_en: 'Charger', name_mk: 'Полнител' },
+  { id: 'battery', name_en: 'Battery / batteries', name_mk: 'Батерија/и' },
+  { id: 'strap', name_en: 'Strap', name_mk: 'Каиш' },
+  { id: 'film', name_en: 'Film', name_mk: 'Филм' },
+  { id: 'lens-cap', name_en: 'Lens cap', name_mk: 'Капаче за објектив' },
 ];
 
 const mounts = [
@@ -547,7 +599,15 @@ export default function AdminDashboard() {
         purchasedBy: formData.purchased_by || null,
         purchasedByNote: formData.purchased_by_note || null,
         generalNote: formData.general_note || null,
-        visibleInCatalog: formData.visible_in_catalog
+        visibleInCatalog: formData.visible_in_catalog,
+        // Camera specifications
+        megapixels: formData.megapixels || null,
+        batteryType: formData.battery_type || null,
+        memoryType: formData.memory_type || null,
+        maxMemoryCapacity: formData.max_memory_capacity || null,
+        internalMemory: formData.internal_memory || null,
+        // Included accessories
+        includedAccessories: formData.included_accessories
       };
 
       const url = editingProduct
@@ -613,7 +673,13 @@ export default function AdminDashboard() {
       purchased_by: product.purchased_by || '',
       purchased_by_note: product.purchased_by_note || '',
       general_note: product.general_note || '',
-      visible_in_catalog: product.visible_in_catalog === 1
+      visible_in_catalog: product.visible_in_catalog === 1,
+      megapixels: product.megapixels || '',
+      battery_type: product.batteryType || '',
+      memory_type: product.memoryType || '',
+      max_memory_capacity: product.maxMemoryCapacity || '',
+      internal_memory: product.internalMemory || '',
+      included_accessories: product.includedAccessories || []
     });
 
     setShowModal(true);
@@ -1430,6 +1496,336 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Camera Specifications Section */}
+              {formData.category === 'camera' && (
+                <div className="border-t pt-4 mt-4">
+                  <h3 className="text-lg font-semibold mb-4">Camera Specifications</h3>
+
+                  {formData.film_digital === 'digital' && (
+                    <div className="space-y-4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Megapixels
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          value={formData.megapixels}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              megapixels: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                          placeholder="e.g. 12.1"
+                        />
+                      </label>
+
+                      <label className="block text-sm font-medium text-gray-700">
+                        Battery Type
+                        <input
+                          type="text"
+                          list="battery-suggestions-digital"
+                          value={formData.battery_type}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              battery_type: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                          placeholder="e.g. AA, AAA, proprietary rechargeable"
+                        />
+                        <datalist id="battery-suggestions-digital">
+                          <option value="AA" />
+                          <option value="AAA" />
+                          <option value="proprietary rechargeable battery" />
+                          <option value="built-in rechargeable battery" />
+                        </datalist>
+                      </label>
+
+                      <label className="block text-sm font-medium text-gray-700">
+                        Memory/Storage Type
+                        <input
+                          type="text"
+                          list="memory-suggestions"
+                          value={formData.memory_type}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              memory_type: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                          placeholder="e.g. SD, SDHC, SDXC, microSD"
+                        />
+                        <datalist id="memory-suggestions">
+                          <option value="SD" />
+                          <option value="SDHC" />
+                          <option value="SDXC" />
+                          <option value="microSD" />
+                          <option value="CompactFlash" />
+                          <option value="Memory Stick" />
+                          <option value="xD" />
+                          <option value="internal memory" />
+                        </datalist>
+                      </label>
+
+                      <label className="block text-sm font-medium text-gray-700">
+                        Maximum Memory Card Capacity (optional)
+                        <input
+                          type="text"
+                          value={formData.max_memory_capacity}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              max_memory_capacity: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                          placeholder="e.g. 16 GB"
+                        />
+                      </label>
+
+                      <label className="block text-sm font-medium text-gray-700">
+                        Internal Memory Capacity (optional)
+                        <input
+                          type="text"
+                          value={formData.internal_memory}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              internal_memory: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                          placeholder="e.g. 8 MB"
+                        />
+                      </label>
+                    </div>
+                  )}
+
+                  {formData.film_digital === 'film' && (
+                    <div className="space-y-4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Film Type/Format
+                        <select
+                          value={formData.film_type}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              film_type: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                        >
+                          <option value="">Select film type</option>
+                          {filmTypes.map(([value, label]) => (
+                            <option key={value} value={value}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label className="block text-sm font-medium text-gray-700">
+                        Battery Type (optional)
+                        <input
+                          type="text"
+                          list="battery-suggestions-analog"
+                          value={formData.battery_type}
+                          onChange={(e) =>
+                            setFormData((previous) => ({
+                              ...previous,
+                              battery_type: e.target.value,
+                            }))
+                          }
+                          className={`${inputClass} mt-1`}
+                          placeholder="e.g. AA, AAA, CR123A, No battery required"
+                        />
+                        <datalist id="battery-suggestions-analog">
+                          <option value="AA" />
+                          <option value="AAA" />
+                          <option value="CR123A" />
+                          <option value="CR2" />
+                          <option value="LR44" />
+                          <option value="No battery required" />
+                        </datalist>
+                      </label>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Included Accessories Section */}
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-lg font-semibold mb-4">Included Accessories</h3>
+
+                <div className="space-y-3">
+                  {accessoryTypes.map((accessory) => {
+                    const isSelected = formData.included_accessories.some(
+                      (a) => a.id === accessory.id
+                    );
+                    const selectedAccessory = formData.included_accessories.find(
+                      (a) => a.id === accessory.id
+                    );
+
+                    return (
+                      <div key={accessory.id} className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id={`accessory-${accessory.id}`}
+                          checked={isSelected}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData((previous) => ({
+                                ...previous,
+                                included_accessories: [
+                                  ...previous.included_accessories,
+                                  {
+                                    id: accessory.id,
+                                    name_en: accessory.name_en,
+                                    name_mk: accessory.name_mk,
+                                    detail: '',
+                                  },
+                                ],
+                              }));
+                            } else {
+                              setFormData((previous) => ({
+                                ...previous,
+                                included_accessories: previous.included_accessories.filter(
+                                  (a) => a.id !== accessory.id
+                                ),
+                              }));
+                            }
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="flex-1">
+                          <label
+                            htmlFor={`accessory-${accessory.id}`}
+                            className="text-sm font-medium text-gray-700"
+                          >
+                            {accessory.name_en}
+                          </label>
+                          {isSelected && (
+                            <input
+                              type="text"
+                              value={selectedAccessory?.detail || ''}
+                              onChange={(e) => {
+                                setFormData((previous) => ({
+                                  ...previous,
+                                  included_accessories: previous.included_accessories.map((a) =>
+                                    a.id === accessory.id
+                                      ? { ...a, detail: e.target.value }
+                                      : a
+                                  ),
+                                }));
+                              }}
+                              className={`${inputClass} mt-1 text-sm`}
+                              placeholder="Optional detail (e.g. 16 GB SD)"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Custom Accessories */}
+                  <div className="border-t pt-3 mt-3">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Custom Accessories</p>
+                    {formData.included_accessories
+                      .filter((a) => a.id === 'custom')
+                      .map((customAccessory, index) => (
+                        <div key={index} className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={customAccessory.name_en}
+                            onChange={(e) => {
+                              setFormData((previous) => ({
+                                ...previous,
+                                included_accessories: previous.included_accessories.map((a, i) =>
+                                  a.id === 'custom' && i === index
+                                    ? { ...a, name_en: e.target.value }
+                                    : a
+                                ),
+                              }));
+                            }}
+                            className={`${inputClass} flex-1`}
+                            placeholder="Name (EN)"
+                          />
+                          <input
+                            type="text"
+                            value={customAccessory.name_mk}
+                            onChange={(e) => {
+                              setFormData((previous) => ({
+                                ...previous,
+                                included_accessories: previous.included_accessories.map((a, i) =>
+                                  a.id === 'custom' && i === index
+                                    ? { ...a, name_mk: e.target.value }
+                                    : a
+                                ),
+                              }));
+                            }}
+                            className={`${inputClass} flex-1`}
+                            placeholder="Name (MK)"
+                          />
+                          <input
+                            type="text"
+                            value={customAccessory.detail}
+                            onChange={(e) => {
+                              setFormData((previous) => ({
+                                ...previous,
+                                included_accessories: previous.included_accessories.map((a, i) =>
+                                  a.id === 'custom' && i === index
+                                    ? { ...a, detail: e.target.value }
+                                    : a
+                                ),
+                              }));
+                            }}
+                            className={`${inputClass} flex-1`}
+                            placeholder="Detail"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData((previous) => ({
+                                ...previous,
+                                included_accessories: previous.included_accessories.filter(
+                                  (a, i) => !(a.id === 'custom' && i === index)
+                                ),
+                              }));
+                            }}
+                            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((previous) => ({
+                          ...previous,
+                          included_accessories: [
+                            ...previous.included_accessories,
+                            {
+                              id: 'custom',
+                              name_en: '',
+                              name_mk: '',
+                              detail: '',
+                            },
+                          ],
+                        }));
+                      }}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      + Add custom accessory
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Sold/Purchase Section */}

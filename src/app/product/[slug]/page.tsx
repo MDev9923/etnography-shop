@@ -13,6 +13,19 @@ import {
   ChevronRight,
   Instagram,
   Mail,
+  Camera,
+  Battery,
+  HardDrive,
+  Film,
+  Package,
+  Box,
+  Zap,
+  Cable,
+  Plug,
+  Radio,
+  Maximize2,
+  Minimize2,
+  CreditCard,
 } from 'lucide-react';
 
 type Product = {
@@ -37,6 +50,17 @@ type Product = {
   specs: Record<string, unknown>;
   images: string[];
   status?: 'available' | 'sold';
+  megapixels?: string | null;
+  batteryType?: string | null;
+  memoryType?: string | null;
+  maxMemoryCapacity?: string | null;
+  internalMemory?: string | null;
+  includedAccessories?: Array<{
+    id: string;
+    name_en: string;
+    name_mk: string;
+    detail: string;
+  }>;
 };
 
 const API_URL = (
@@ -48,6 +72,22 @@ const imageBackground = {
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
 };
+
+function getAccessoryIcon(accessoryId: string): any {
+  const iconMap: Record<string, any> = {
+    'memory-card': CreditCard,
+    'case': Box,
+    'flash': Zap,
+    'data-cable': Cable,
+    'charger': Plug,
+    'battery': Battery,
+    'strap': Radio,
+    'film': Film,
+    'lens-cap': Minimize2,
+    'custom': Package,
+  };
+  return iconMap[accessoryId] || Package;
+}
 
 function getImageUrl(value?: string): string {
   let url = value?.trim() || '';
@@ -83,6 +123,7 @@ export default function ProductPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<'specifications' | 'included'>('specifications');
 
   const product = allProducts.find(
     (item) => String(item.slug) === slug
@@ -494,48 +535,187 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {getTranslation(
-                  language,
-                  'product.specifications'
-                )}
-              </h3>
+              {/* Tab Navigation */}
+              <div className="border-b border-gray-200 mb-4">
+                <nav className="flex space-x-8" aria-label="Tabs">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('specifications')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'specifications'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                    aria-selected={activeTab === 'specifications'}
+                    role="tab"
+                  >
+                    {getTranslation(language, 'product.specifications')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('included')}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === 'included'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                    aria-selected={activeTab === 'included'}
+                    role="tab"
+                  >
+                    {getTranslation(language, 'product.whatsIncluded')}
+                  </button>
+                </nav>
+              </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
-                <dl className="space-y-3">
-                  {Object.entries(
-                    product.specs ?? {}
-                  ).map(([key, value]) => (
-                    <div
-                      key={key}
-                      className="flex justify-between gap-4"
-                    >
-                      <dt className="min-w-0 text-sm font-medium text-gray-500 capitalize break-words">
-                        {key
-                          .replace(/([A-Z])/g, ' $1')
-                          .trim()}
+              {/* Specifications Tab */}
+              {activeTab === 'specifications' && (
+                <div className="bg-gray-50 rounded-lg p-4 sm:p-6" role="tabpanel">
+                  <dl className="space-y-3">
+                    {/* Condition */}
+                    <div className="flex items-start gap-3">
+                      <dt className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+                        <Box className="h-4 w-4 flex-shrink-0" />
+                        {getTranslation(language, 'product.condition')}
                       </dt>
-
-                      <dd className="min-w-0 text-sm text-gray-900 font-medium text-right break-words">
-                        {String(value)}
+                      <dd className="text-sm text-gray-900 font-medium break-words">
+                        {conditionText}
                       </dd>
                     </div>
-                  ))}
 
-                  <div className="flex justify-between pt-3 border-t border-gray-200 gap-4">
-                    <dt className="text-sm font-medium text-gray-500">
-                      {getTranslation(
-                        language,
-                        'product.condition'
-                      )}
-                    </dt>
+                    {/* Megapixels (digital only) */}
+                    {product.filmDigital === 'digital' && product.megapixels && (
+                      <div className="flex items-start gap-3">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+                          <Camera className="h-4 w-4 flex-shrink-0" />
+                          {getTranslation(language, 'product.megapixels')}
+                        </dt>
+                        <dd className="text-sm text-gray-900 font-medium break-words">
+                          {product.megapixels} MP
+                        </dd>
+                      </div>
+                    )}
 
-                    <dd className="text-sm text-gray-900 font-medium text-right">
-                      {conditionText}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
+                    {/* Battery Type */}
+                    {product.batteryType && (
+                      <div className="flex items-start gap-3">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+                          <Battery className="h-4 w-4 flex-shrink-0" />
+                          {getTranslation(language, 'product.batteryType')}
+                        </dt>
+                        <dd className="text-sm text-gray-900 font-medium break-words">
+                          {product.batteryType}
+                        </dd>
+                      </div>
+                    )}
+
+                    {/* Memory Type (digital only) */}
+                    {product.filmDigital === 'digital' && product.memoryType && (
+                      <div className="flex items-start gap-3">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+                          <CreditCard className="h-4 w-4 flex-shrink-0" />
+                          {getTranslation(language, 'product.memoryType')}
+                        </dt>
+                        <dd className="text-sm text-gray-900 font-medium break-words">
+                          {product.memoryType}
+                        </dd>
+                      </div>
+                    )}
+
+                    {/* Max Memory Capacity (digital only) */}
+                    {product.filmDigital === 'digital' && product.maxMemoryCapacity && (
+                      <div className="flex items-start gap-3">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+                          <Maximize2 className="h-4 w-4 flex-shrink-0" />
+                          {getTranslation(language, 'product.maxMemoryCapacity')}
+                        </dt>
+                        <dd className="text-sm text-gray-900 font-medium break-words">
+                          {product.maxMemoryCapacity}
+                        </dd>
+                      </div>
+                    )}
+
+                    {/* Internal Memory (digital only) */}
+                    {product.filmDigital === 'digital' && product.internalMemory && (
+                      <div className="flex items-start gap-3">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+                          <HardDrive className="h-4 w-4 flex-shrink-0" />
+                          {getTranslation(language, 'product.internalMemory')}
+                        </dt>
+                        <dd className="text-sm text-gray-900 font-medium break-words">
+                          {product.internalMemory}
+                        </dd>
+                      </div>
+                    )}
+
+                    {/* Film Format (analog only) */}
+                    {product.filmDigital === 'film' && product.filmType && (
+                      <div className="flex items-start gap-3">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+                          <Film className="h-4 w-4 flex-shrink-0" />
+                          {getTranslation(language, 'product.filmFormat')}
+                        </dt>
+                        <dd className="text-sm text-gray-900 font-medium break-words">
+                          {getTranslation(language, `catalog.filmTypes.${product.filmType.replace(/-/g, '')}`) || product.filmType}
+                        </dd>
+                      </div>
+                    )}
+
+                    {/* Legacy specs */}
+                    {Object.entries(product.specs ?? {}).map(([key, value]) => {
+                      // Skip if it's condition (already shown) or film type (already shown)
+                      if (key.toLowerCase() === 'condition' || key.toLowerCase() === 'filmtype' || key.toLowerCase() === 'film_type') {
+                        return null;
+                      }
+                      return (
+                        <div key={key} className="flex items-start gap-3">
+                          <dt className="min-w-0 text-sm font-medium text-gray-500 capitalize break-words">
+                            {key.replace(/([A-Z])/g, ' $1').trim()}
+                          </dt>
+                          <dd className="text-sm text-gray-900 font-medium break-words">
+                            {String(value)}
+                          </dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                </div>
+              )}
+
+              {/* What's Included Tab */}
+              {activeTab === 'included' && (
+                <div className="bg-gray-50 rounded-lg p-4 sm:p-6" role="tabpanel">
+                  {product.includedAccessories && product.includedAccessories.length > 0 ? (
+                    <ul className="space-y-3">
+                      {product.includedAccessories.map((accessory) => {
+                        const Icon = getAccessoryIcon(accessory.id);
+                        const name = accessory.id === 'custom'
+                          ? accessory.name_en
+                          : getTranslation(language, `product.accessories.${accessory.id}`);
+
+                        return (
+                          <li key={accessory.id} className="flex items-start gap-3">
+                            <Icon className="h-5 w-5 flex-shrink-0 text-gray-600 mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-gray-900">
+                                {name}
+                              </p>
+                              {accessory.detail && (
+                                <p className="text-sm text-gray-500">
+                                  {accessory.detail}
+                                </p>
+                              )}
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-gray-500 italic">
+                      {getTranslation(language, 'product.noAccessories')}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
