@@ -529,7 +529,7 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                 )}
               </h3>
 
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {description}
               </p>
             </div>

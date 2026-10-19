@@ -145,7 +145,7 @@ export function ProductCard({
 
         {/* Description - truncate and preserve line breaks */}
         <div className="mb-4 flex-1">
-          <p className="text-sm text-gray-600 line-clamp-3 whitespace-pre-line">
+          <p className="text-sm text-gray-600 line-clamp-3 whitespace-pre-wrap">
             {product.description?.[language] || product.description?.en || ''}
           </p>
         </div>
