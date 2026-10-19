@@ -233,10 +233,10 @@ export const translations: Record<Language, Translation> = {
       },
       conditions: {
         likeNew: 'Како Ново',
-        excellent: 'Одлично',
+        excellent: 'Одлична',
         'very-good': 'Многу Добра',
-        good: 'Добро',
-        low: 'Слабо'
+        good: 'Добра',
+        low: 'Слаба'
       }
     },
     product: {
