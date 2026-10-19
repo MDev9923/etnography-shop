@@ -729,6 +729,9 @@ export default function AdminDashboard() {
       String(product.slug || '').toLowerCase().includes(search);
 
     return matchesSearch && (showSold || product.status !== 'sold');
+  }).filter((product) => {
+    // Filter out products with no name or brand (empty/incomplete products)
+    return product.name?.en && product.brand;
   });
 
   if (loading) {

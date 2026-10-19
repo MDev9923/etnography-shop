@@ -143,6 +143,13 @@ export function ProductCard({
           </Link>
         </div>
 
+        {/* Description - truncate and preserve line breaks */}
+        <div className="mb-4 flex-1">
+          <p className="text-sm text-gray-600 line-clamp-3 whitespace-pre-line">
+            {product.description?.[language] || product.description?.en || ''}
+          </p>
+        </div>
+
         <div className="flex items-center justify-between gap-2 mb-4">
           <span className="text-xl font-bold text-gray-900">
             {formattedPrice}
