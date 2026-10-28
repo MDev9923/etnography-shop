@@ -344,17 +344,14 @@ export default function CatalogPage() {
             <option value="">
               {language === 'en' ? 'All Film Types' : 'Сите типови филм'}
             </option>
-            <option value="35mm-color">
-              {getTranslation(language, 'catalog.filmTypes.mm35Color')}
+            <option value="35mm">
+              {getTranslation(language, 'catalog.filmTypes.mm35')}
             </option>
-            <option value="35mm-bw">
-              {getTranslation(language, 'catalog.filmTypes.mm35BW')}
+            <option value="120">
+              {getTranslation(language, 'catalog.filmTypes.mm120')}
             </option>
-            <option value="120-color">
-              {getTranslation(language, 'catalog.filmTypes.mm120Color')}
-            </option>
-            <option value="120-bw">
-              {getTranslation(language, 'catalog.filmTypes.mm120BW')}
+            <option value="super-8">
+              {getTranslation(language, 'catalog.filmTypes.super8')}
             </option>
           </select>
         </div>

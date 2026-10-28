@@ -52,28 +52,15 @@ export const translations: Record<Language, Translation> = {
      filmTypes: {
         mm35: '35mm',
         mm120: '120',
-        mm35Color: '35mm Color',
-        mm35BW: '35mm Black & White',
-        mm120Color: '120 Color',
-        mm120BW: '120 Black & White',
-        aps: 'APS',
-        mm110: '110',
-        mm110Color: '110 Color',
-        mm110BW: '110 Black & White',
-        polaroidSX70: 'Polaroid SX-70',
-        polaroid600: 'Polaroid 600',
-        polaroidIType: 'Polaroid i-Type',
-        instaxMini: 'Instax Mini',
-        instaxSquare: 'Instax Square',
-        instaxWide: 'Instax Wide',
-        xiaomiZink: 'Xiaomi ZINK Paper',
+        super8: 'Super 8',
       },
       conditions: {
         likeNew: 'Like New',
         excellent: 'Excellent',
         veryGood: 'Very Good',
         good: 'Good',
-        low: 'Low'
+        low: 'Low',
+        parts: 'For Parts/Non Working'
       }
     },
     product: {
@@ -100,6 +87,7 @@ export const translations: Record<Language, Translation> = {
         'charger': 'Charger',
         'battery': 'Battery / batteries',
         'strap': 'Strap',
+        'lens-strap': 'Lens strap',
         'film': 'Film',
         'lens-cap': 'Lens cap',
       }
@@ -226,17 +214,17 @@ export const translations: Record<Language, Translation> = {
         analog: 'Аналогно'
       },
       filmTypes: {
-        mm35Color: '35mm во боја',
-        mm35BW: '35mm црно-бело',
-        mm120Color: '120 во боја',
-        mm120BW: '120 црно-бело'
+        mm35: '35mm',
+        mm120: '120',
+        super8: 'Super 8',
       },
       conditions: {
         likeNew: 'Како Ново',
-        excellent: 'Одлична',
-        'very-good': 'Многу Добра',
-        good: 'Добра',
-        low: 'Слаба'
+        excellent: 'Одлично',
+        veryGood: 'Многу Добро',
+        good: 'Добро',
+        low: 'Слабо',
+        parts: 'За Делови/Расипани/Полуфункционални'
       }
     },
     product: {
@@ -263,6 +251,7 @@ export const translations: Record<Language, Translation> = {
         'charger': 'Полнач',
         'battery': 'Батерија/и',
         'strap': 'Каиш',
+        'lens-strap': 'Каиш за објектив',
         'film': 'Филм',
         'lens-cap': 'Капаче за објектив',
       }

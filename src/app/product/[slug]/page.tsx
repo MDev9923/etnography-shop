@@ -82,6 +82,7 @@ function getAccessoryIcon(accessoryId: string): any {
     'charger': Plug,
     'battery': Battery,
     'strap': Radio,
+    'lens-strap': Radio,
     'film': Film,
     'lens-cap': Minimize2,
     'custom': Package,

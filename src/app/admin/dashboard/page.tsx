@@ -165,22 +165,9 @@ const inputClass =
   'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 bg-white text-gray-900';
 
 const filmTypes = [
-  ['35mm-color', '35mm Color'],
-  ['35mm-bw', '35mm Black & White'],
-  ['120-color', '120 Color'],
-  ['120-bw', '120 Black & White'],
-  ['instant', 'Instant'],
-  ['medium-format', 'Medium Format'],
-  ['large-format', 'Large Format'],
-  ['aps', 'APS'],
-  ['110', '110'],
-  ['disc', 'Disc'],
-  ['polaroid-sx70', 'Polaroid SX-70'],
-  ['polaroid-600', 'Polaroid 600'],
-  ['polaroid-itype', 'Polaroid i-Type'],
-  ['instax-mini', 'Instax Mini'],
-  ['instax-square', 'Instax Square'],
-  ['instax-wide', 'Instax Wide'],
+  ['35mm', '35mm'],
+  ['120', '120'],
+  ['super-8', 'Super 8'],
 ];
 
 const accessoryTypes = [
@@ -191,6 +178,7 @@ const accessoryTypes = [
   { id: 'charger', name_en: 'Charger', name_mk: 'Полнач' },
   { id: 'battery', name_en: 'Battery / batteries', name_mk: 'Батерија/и' },
   { id: 'strap', name_en: 'Strap', name_mk: 'Каиш' },
+  { id: 'lens-strap', name_en: 'Lens strap', name_mk: 'Каиш за објектив' },
   { id: 'film', name_en: 'Film', name_mk: 'Филм' },
   { id: 'lens-cap', name_en: 'Lens cap', name_mk: 'Капаче за објектив' },
 ];
@@ -1297,9 +1285,11 @@ export default function AdminDashboard() {
                     className={`${inputClass} mt-1`}
                   >
                     <option value="like-new">Like New</option>
+                    <option value="excellent">Excellent</option>
                     <option value="very-good">Very Good</option>
                     <option value="good">Good</option>
-                    <option value="excellent">Excellent</option>
+                    <option value="low">Low</option>
+                    <option value="parts">For Parts/Non Working</option>
                   </select>
                 </label>
               </div>
@@ -1897,7 +1887,7 @@ export default function AdminDashboard() {
                           purchase_amount_mkd:
                             e.target.value === ''
                               ? ''
-                              : (Number(e.target.value) * 62).toFixed(0),
+                              : Math.round(Number(e.target.value) * 62).toString(),
                         }))
                       }
                       className={`${inputClass} mt-1`}
@@ -1918,7 +1908,7 @@ export default function AdminDashboard() {
                           purchase_amount_eur:
                             e.target.value === ''
                               ? ''
-                              : (Number(e.target.value) / 62).toFixed(2),
+                              : Math.round(Number(e.target.value) / 62).toString(),
                         }))
                       }
                       className={`${inputClass} mt-1`}
@@ -1941,7 +1931,7 @@ export default function AdminDashboard() {
                               selling_price_mkd:
                                 e.target.value === ''
                                   ? ''
-                                  : (Number(e.target.value) * 62).toFixed(0),
+                                  : Math.round(Number(e.target.value) * 62).toString(),
                             }))
                           }
                           className={`${inputClass} mt-1`}
@@ -1963,7 +1953,7 @@ export default function AdminDashboard() {
                               selling_price_eur:
                                 e.target.value === ''
                                   ? ''
-                                  : (Number(e.target.value) / 62).toFixed(2),
+                                  : Math.round(Number(e.target.value) / 62).toString(),
                             }))
                           }
                           className={`${inputClass} mt-1`}
