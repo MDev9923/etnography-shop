@@ -656,7 +656,30 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                           {getTranslation(language, 'product.filmFormat')}
                         </dt>
                         <dd className="text-sm text-gray-900 font-medium break-words">
-                          {getTranslation(language, `catalog.filmTypes.${product.filmType.replace(/-/g, '')}`) || product.filmType}
+                          {(() => {
+                            const keyMap: Record<string, string> = {
+                              '35mm': 'mm35',
+                              '120': 'mm120',
+                              'super-8': 'super8',
+                              '35mm-color': 'mm35Color',
+                              '35mm-bw': 'mm35BW',
+                              '120-color': 'mm120Color',
+                              '120-bw': 'mm120BW',
+                              'aps': 'aps',
+                              '110': 'mm110',
+                              '110-color': 'mm110Color',
+                              '110-bw': 'mm110BW',
+                              'polaroid-sx70': 'polaroidSX70',
+                              'polaroid-600': 'polaroid600',
+                              'polaroid-itype': 'polaroidIType',
+                              'instax-mini': 'instaxMini',
+                              'instax-square': 'instaxSquare',
+                              'instax-wide': 'instaxWide',
+                              'xiaomi-zink': 'xiaomiZink',
+                            };
+                            const translationKey = keyMap[product.filmType] || product.filmType;
+                            return getTranslation(language, `catalog.filmTypes.${translationKey}`) || product.filmType;
+                          })()}
                         </dd>
                       </div>
                     )}

@@ -353,6 +353,51 @@ export default function CatalogPage() {
             <option value="super-8">
               {getTranslation(language, 'catalog.filmTypes.super8')}
             </option>
+            <option value="35mm-color">
+              {getTranslation(language, 'catalog.filmTypes.mm35Color')}
+            </option>
+            <option value="35mm-bw">
+              {getTranslation(language, 'catalog.filmTypes.mm35BW')}
+            </option>
+            <option value="120-color">
+              {getTranslation(language, 'catalog.filmTypes.mm120Color')}
+            </option>
+            <option value="120-bw">
+              {getTranslation(language, 'catalog.filmTypes.mm120BW')}
+            </option>
+            <option value="aps">
+              {getTranslation(language, 'catalog.filmTypes.aps')}
+            </option>
+            <option value="110">
+              {getTranslation(language, 'catalog.filmTypes.mm110')}
+            </option>
+            <option value="110-color">
+              {getTranslation(language, 'catalog.filmTypes.mm110Color')}
+            </option>
+            <option value="110-bw">
+              {getTranslation(language, 'catalog.filmTypes.mm110BW')}
+            </option>
+            <option value="polaroid-sx70">
+              {getTranslation(language, 'catalog.filmTypes.polaroidSX70')}
+            </option>
+            <option value="polaroid-600">
+              {getTranslation(language, 'catalog.filmTypes.polaroid600')}
+            </option>
+            <option value="polaroid-itype">
+              {getTranslation(language, 'catalog.filmTypes.polaroidIType')}
+            </option>
+            <option value="instax-mini">
+              {getTranslation(language, 'catalog.filmTypes.instaxMini')}
+            </option>
+            <option value="instax-square">
+              {getTranslation(language, 'catalog.filmTypes.instaxSquare')}
+            </option>
+            <option value="instax-wide">
+              {getTranslation(language, 'catalog.filmTypes.instaxWide')}
+            </option>
+            <option value="xiaomi-zink">
+              {getTranslation(language, 'catalog.filmTypes.xiaomiZink') || 'Xiaomi ZINK Paper'}
+            </option>
           </select>
         </div>
       )}

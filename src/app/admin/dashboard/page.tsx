@@ -168,6 +168,23 @@ const filmTypes = [
   ['35mm', '35mm'],
   ['120', '120'],
   ['super-8', 'Super 8'],
+  ['35mm-color', '35mm Color'],
+  ['35mm-bw', '35mm Black & White'],
+  ['120-color', '120 Color'],
+  ['120-bw', '120 Black & White'],
+  ['instant', 'Instant'],
+  ['medium-format', 'Medium Format'],
+  ['large-format', 'Large Format'],
+  ['aps', 'APS'],
+  ['110', '110'],
+  ['disc', 'Disc'],
+  ['polaroid-sx70', 'Polaroid SX-70'],
+  ['polaroid-600', 'Polaroid 600'],
+  ['polaroid-itype', 'Polaroid i-Type'],
+  ['instax-mini', 'Instax Mini'],
+  ['instax-square', 'Instax Square'],
+  ['instax-wide', 'Instax Wide'],
+  ['xiaomi-zink', 'Xiaomi ZINK Paper'],
 ];
 
 const accessoryTypes = [
