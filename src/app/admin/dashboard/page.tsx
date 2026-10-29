@@ -1356,6 +1356,33 @@ export default function AdminDashboard() {
                   </select>
                 </label>
 
+                {(formData.film_digital === 'film' || formData.film_digital === 'analog') && (
+                  <label className="block text-sm font-medium text-gray-700">
+                    Battery Type (optional)
+                    <input
+                      type="text"
+                      list="battery-suggestions-main"
+                      value={formData.battery_type}
+                      onChange={(e) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          battery_type: e.target.value,
+                        }))
+                      }
+                      className={`${inputClass} mt-1`}
+                      placeholder="e.g. AA, AAA, CR123A, No battery required"
+                    />
+                    <datalist id="battery-suggestions-main">
+                      <option value="AA" />
+                      <option value="AAA" />
+                      <option value="CR123A" />
+                      <option value="CR2" />
+                      <option value="LR44" />
+                      <option value="No battery required" />
+                    </datalist>
+                  </label>
+                )}
+
                 <label className="block text-sm font-medium text-gray-700">
                   Mount
                   <select
@@ -1621,7 +1648,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  {formData.film_digital === 'film' && (
+                  {(formData.film_digital === 'film' || formData.film_digital === 'analog') && (
                     <div className="space-y-4">
                       <label className="block text-sm font-medium text-gray-700">
                         Film Type/Format
