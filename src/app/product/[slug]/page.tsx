@@ -26,6 +26,7 @@ import {
   Maximize2,
   Minimize2,
   CreditCard,
+  Link,
 } from 'lucide-react';
 
 type Product = {
@@ -81,8 +82,8 @@ function getAccessoryIcon(accessoryId: string): any {
     'data-cable': Cable,
     'charger': Plug,
     'battery': Battery,
-    'strap': Radio,
-    'lens-strap': Radio,
+    'strap': Link,
+    'lens-strap': Link,
     'film': Film,
     'lens-cap': Minimize2,
     'custom': Package,
@@ -713,7 +714,7 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                       {product.includedAccessories.map((accessory) => {
                         const Icon = getAccessoryIcon(accessory.id);
                         const name = accessory.id === 'custom'
-                          ? accessory.name_en
+                          ? (language === 'en' ? accessory.name_en : accessory.name_mk)
                           : getTranslation(language, `product.accessories.${accessory.id}`);
 
                         return (

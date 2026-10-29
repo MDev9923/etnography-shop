@@ -49,6 +49,14 @@ export const translations: Record<Language, Translation> = {
         digital: 'Digital',
         both: 'Both'
       },
+      conditions: {
+        likeNew: 'Like New',
+        excellent: 'Excellent',
+        veryGood: 'Very Good',
+        good: 'Good',
+        low: 'Low',
+        parts: 'For Parts/Non Working'
+      },
       filmTypes: {
         mm35: '35mm',
         mm120: '120',
@@ -69,14 +77,6 @@ export const translations: Record<Language, Translation> = {
         instaxWide: 'Instax Wide',
         xiaomiZink: 'Xiaomi ZINK Paper',
       },
-      conditions: {
-        likeNew: 'Like New',
-        excellent: 'Excellent',
-        veryGood: 'Very Good',
-        good: 'Good',
-        low: 'Low',
-        parts: 'For Parts/Non Working'
-      }
     },
     product: {
       specifications: 'Specifications',
@@ -94,6 +94,14 @@ export const translations: Record<Language, Translation> = {
       maxMemoryCapacity: 'Maximum Memory Card Capacity',
       internalMemory: 'Internal Memory',
       filmFormat: 'Film Format',
+      conditions: {
+        likeNew: 'Like New',
+        excellent: 'Excellent',
+        veryGood: 'Very Good',
+        good: 'Good',
+        low: 'Low',
+        parts: 'For Parts/Non Working'
+      },
       accessories: {
         'memory-card': 'Memory card',
         'case': 'Case',
@@ -228,6 +236,14 @@ export const translations: Record<Language, Translation> = {
         both: 'Двете',
         analog: 'Аналогно'
       },
+      conditions: {
+        likeNew: 'Како Ново',
+        excellent: 'Одлично',
+        veryGood: 'Многу Добро',
+        good: 'Добро',
+        low: 'Слабо',
+        parts: 'За Делови/Расипани/Полуфункционални'
+      },
       filmTypes: {
         mm35: '35mm',
         mm120: '120',
@@ -248,14 +264,6 @@ export const translations: Record<Language, Translation> = {
         instaxWide: 'Instax Wide',
         xiaomiZink: 'Xiaomi ZINK Paper',
       },
-      conditions: {
-        likeNew: 'Како Ново',
-        excellent: 'Одлично',
-        veryGood: 'Многу Добро',
-        good: 'Добро',
-        low: 'Слабо',
-        parts: 'За Делови/Расипани/Полуфункционални'
-      }
     },
     product: {
       specifications: 'Спецификации',
@@ -273,6 +281,14 @@ export const translations: Record<Language, Translation> = {
       maxMemoryCapacity: 'Максимален капацитет на мемориска картичка',
       internalMemory: 'Внатрешна меморија',
       filmFormat: 'Формат на филм',
+      conditions: {
+        likeNew: 'Како Ново',
+        excellent: 'Одлично',
+        veryGood: 'Многу Добро',
+        good: 'Добро',
+        low: 'Слабо',
+        parts: 'За Делови/Расипани/Полуфункционални'
+      },
       accessories: {
         'memory-card': 'Мемориска картичка',
         'case': 'Футрола',

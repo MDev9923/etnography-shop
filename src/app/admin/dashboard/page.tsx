@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, LogOut, Search, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, LogOut, Search, Upload, Eye, EyeOff, X } from 'lucide-react';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
@@ -266,6 +266,7 @@ export default function AdminDashboard() {
     dateFrom: '',
     dateTo: '',
     purchasedBy: '',
+    visible: '',
     expenseDateFrom: '',
     expenseDateTo: '',
     expensePaidBy: ''
@@ -728,6 +729,39 @@ export default function AdminDashboard() {
     }
   }
 
+  async function handleToggleVisibility(product: Product) {
+    const token = localStorage.getItem('adminToken');
+
+    if (!token) {
+      router.replace('/admin/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/products/${product.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...product,
+          visibleInCatalog: product.visible_in_catalog === 1 ? 0 : 1,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product visibility');
+      }
+
+      await fetchProducts();
+    } catch (err) {
+      alert(
+        err instanceof Error ? err.message : 'Failed to update product visibility'
+      );
+    }
+  }
+
   const search = searchTerm.trim().toLowerCase();
 
   const filteredProducts = products.filter((product) => {
@@ -809,25 +843,35 @@ export default function AdminDashboard() {
                     type="date"
                     value={soldFilters.dateFrom}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   />
                   <label className="block text-xs text-gray-600">Датум до</label>
                   <input
                     type="date"
                     value={soldFilters.dateTo}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, dateTo: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   />
                   <label className="block text-xs text-gray-600">Купено од</label>
                   <select
                     value={soldFilters.purchasedBy}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, purchasedBy: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   >
                     <option value="">Сите</option>
                     <option value="Matej">Matej</option>
                     <option value="Gogo">Gogo</option>
                     <option value="Drugo">Drugo</option>
+                  </select>
+                  <label className="block text-xs text-gray-600">Видливост</label>
+                  <select
+                    value={soldFilters.visible}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, visible: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
+                  >
+                    <option value="">Сите</option>
+                    <option value="visible">Видливо</option>
+                    <option value="hidden">Скриено</option>
                   </select>
                 </div>
 
@@ -839,20 +883,20 @@ export default function AdminDashboard() {
                     type="date"
                     value={soldFilters.expenseDateFrom}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateFrom: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   />
                   <label className="block text-xs text-gray-600">Датум до</label>
                   <input
                     type="date"
                     value={soldFilters.expenseDateTo}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateTo: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   />
                   <label className="block text-xs text-gray-600">Платено од</label>
                   <select
                     value={soldFilters.expensePaidBy}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, expensePaidBy: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   >
                     <option value="">Сите</option>
                     <option value="Matej">Matej</option>
@@ -867,6 +911,7 @@ export default function AdminDashboard() {
                       dateFrom: '',
                       dateTo: '',
                       purchasedBy: '',
+                      visible: '',
                       expenseDateFrom: '',
                       expenseDateTo: '',
                       expensePaidBy: ''
@@ -919,6 +964,7 @@ export default function AdminDashboard() {
                           <th className="px-4 py-3 text-black">Профит</th>
                           <th className="px-4 py-3 text-black">Матеј</th>
                           <th className="px-4 py-3 text-black">Гого</th>
+                          <th className="px-4 py-3 text-black">Видливо</th>
                           <th className="px-4 py-3 text-black">Датум на Продажба</th>
                         </tr>
                       </thead>
@@ -928,6 +974,8 @@ export default function AdminDashboard() {
                             if (soldFilters.purchasedBy && product.purchasedBy !== soldFilters.purchasedBy) return false;
                             if (soldFilters.dateFrom && product.soldDate && product.soldDate < soldFilters.dateFrom) return false;
                             if (soldFilters.dateTo && product.soldDate && product.soldDate > soldFilters.dateTo) return false;
+                            if (soldFilters.visible === 'visible' && !product.visible_in_catalog) return false;
+                            if (soldFilters.visible === 'hidden' && product.visible_in_catalog) return false;
                             return true;
                           })
                           .map((product: any) => (
@@ -939,6 +987,13 @@ export default function AdminDashboard() {
                             <td className="px-4 py-3 text-green-600 font-medium text-black">{product.profitMKD?.toFixed(0) || '-'} ден</td>
                             <td className="px-4 py-3 text-black">{product.matejMKD?.toFixed(0) || '-'} ден</td>
                             <td className="px-4 py-3 text-black">{product.gogoMKD?.toFixed(0) || '-'} ден</td>
+                            <td className="px-4 py-3 text-black">
+                              {product.visible_in_catalog ? (
+                                <Eye className="h-5 w-5 text-green-600" />
+                              ) : (
+                                <EyeOff className="h-5 w-5 text-gray-400" />
+                              )}
+                            </td>
                             <td className="px-4 py-3 text-sm text-black">{product.soldDate ? new Date(product.soldDate).toLocaleDateString() : '-'}</td>
                           </tr>
                         ))}
@@ -1087,6 +1142,7 @@ export default function AdminDashboard() {
                   <th className="px-4 py-3 hidden md:table-cell">Category</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Price</th>
+                  <th className="px-4 py-3">Visible</th>
                   <th className="px-4 py-3">Actions</th>
                 </tr>
               </thead>
@@ -1141,6 +1197,16 @@ export default function AdminDashboard() {
                     </td>
 
                     <td className="px-4 py-3">
+                      <button
+                        onClick={() => void handleToggleVisibility(product)}
+                        aria-label={product.visible_in_catalog ? 'Hide from catalog' : 'Show in catalog'}
+                        className={product.visible_in_catalog ? 'text-green-600 hover:text-green-800' : 'text-gray-400 hover:text-gray-600'}
+                      >
+                        {product.visible_in_catalog ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                      </button>
+                    </td>
+
+                    <td className="px-4 py-3">
                       <div className="flex gap-3">
                         <button
                           onClick={() => handleEdit(product)}
@@ -1164,7 +1230,7 @@ export default function AdminDashboard() {
                 {filteredProducts.length === 0 && (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-4 py-12 text-center text-gray-500"
                     >
                       {products.length === 0
@@ -1187,11 +1253,23 @@ export default function AdminDashboard() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="product-modal-title"
-            className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6"
+            className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 relative"
           >
+            <button
+              type="button"
+              onClick={() => {
+                setShowModal(false);
+                setEditingProduct(null);
+                setFormData(createEmptyForm());
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              aria-label="Close"
+            >
+              <X className="h-6 w-6" />
+            </button>
             <h2
               id="product-modal-title"
-              className="text-2xl font-bold text-gray-900 mb-6"
+              className="text-2xl font-bold text-gray-900 mb-6 pr-8"
             >
               {editingProduct ? 'Edit Product' : 'Add Product'}
             </h2>
