@@ -120,6 +120,7 @@ interface ProductForm {
   // Included accessories
   included_accessories: Array<{
     id: string;
+    customId?: string;
     name_en: string;
     name_mk: string;
     detail: string;
@@ -684,7 +685,10 @@ export default function AdminDashboard() {
       memory_type: product.memoryType || '',
       max_memory_capacity: product.maxMemoryCapacity || '',
       internal_memory: product.internalMemory || '',
-      included_accessories: product.includedAccessories || []
+      included_accessories: (product.includedAccessories || []).map((a: any) => ({
+        ...a,
+        customId: a.id === 'custom' ? (a.customId || Date.now().toString() + Math.random()) : undefined
+      }))
     });
 
     setShowModal(true);
@@ -1748,16 +1752,16 @@ export default function AdminDashboard() {
                     <p className="text-sm font-medium text-gray-700 mb-2">Custom Accessories</p>
                     {formData.included_accessories
                       .filter((a) => a.id === 'custom')
-                      .map((customAccessory, index) => (
-                        <div key={index} className="flex gap-2 mb-2">
+                      .map((customAccessory) => (
+                        <div key={customAccessory.customId || customAccessory.name_en} className="flex gap-2 mb-2">
                           <input
                             type="text"
                             value={customAccessory.name_en}
                             onChange={(e) => {
                               setFormData((previous) => ({
                                 ...previous,
-                                included_accessories: previous.included_accessories.map((a, i) =>
-                                  a.id === 'custom' && i === index
+                                included_accessories: previous.included_accessories.map((a) =>
+                                  a.id === 'custom' && (a.customId === customAccessory.customId || a.name_en === customAccessory.name_en)
                                     ? { ...a, name_en: e.target.value }
                                     : a
                                 ),
@@ -1772,8 +1776,8 @@ export default function AdminDashboard() {
                             onChange={(e) => {
                               setFormData((previous) => ({
                                 ...previous,
-                                included_accessories: previous.included_accessories.map((a, i) =>
-                                  a.id === 'custom' && i === index
+                                included_accessories: previous.included_accessories.map((a) =>
+                                  a.id === 'custom' && (a.customId === customAccessory.customId || a.name_en === customAccessory.name_en)
                                     ? { ...a, name_mk: e.target.value }
                                     : a
                                 ),
@@ -1788,8 +1792,8 @@ export default function AdminDashboard() {
                             onChange={(e) => {
                               setFormData((previous) => ({
                                 ...previous,
-                                included_accessories: previous.included_accessories.map((a, i) =>
-                                  a.id === 'custom' && i === index
+                                included_accessories: previous.included_accessories.map((a) =>
+                                  a.id === 'custom' && (a.customId === customAccessory.customId || a.name_en === customAccessory.name_en)
                                     ? { ...a, detail: e.target.value }
                                     : a
                                 ),
@@ -1804,7 +1808,7 @@ export default function AdminDashboard() {
                               setFormData((previous) => ({
                                 ...previous,
                                 included_accessories: previous.included_accessories.filter(
-                                  (a, i) => !(a.id === 'custom' && i === index)
+                                  (a) => !(a.id === 'custom' && (a.customId === customAccessory.customId || a.name_en === customAccessory.name_en))
                                 ),
                               }));
                             }}
@@ -1823,6 +1827,7 @@ export default function AdminDashboard() {
                             ...previous.included_accessories,
                             {
                               id: 'custom',
+                              customId: Date.now().toString(),
                               name_en: '',
                               name_mk: '',
                               detail: '',
