@@ -377,6 +377,25 @@ export default function AdminDashboard() {
     await fetchFinancialSummary();
   };
 
+  const toggleExpenseStatus = async (expenseId: number, currentStatus: string) => {
+    const token = localStorage.getItem('adminToken');
+    const newStatus = currentStatus === 'done' ? 'pending' : 'done';
+    const response = await fetch(`${API_URL}/api/admin/expenses/${expenseId}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ status: newStatus }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update expense status');
+    }
+
+    await fetchFinancialSummary();
+  };
+
   const openAddExpenseModal = () => {
     setEditingExpense(null);
     setExpenseFormData({
@@ -1024,6 +1043,7 @@ export default function AdminDashboard() {
                             <th className="px-4 py-3 text-black">Сума</th>
                             <th className="px-4 py-3 text-black">Датум</th>
                             <th className="px-4 py-3 text-black">Платено од</th>
+                            <th className="px-4 py-3 text-black">Статус</th>
                             <th className="px-4 py-3 text-black">Акции</th>
                           </tr>
                         </thead>
@@ -1036,13 +1056,34 @@ export default function AdminDashboard() {
                               return true;
                             })
                             .map((expense: any) => (
-                            <tr key={expense.id} className="hover:bg-gray-50">
+                            <tr
+                              key={expense.id}
+                              className={`hover:bg-gray-50 ${expense.status === 'done' ? 'bg-gray-100 opacity-60' : ''}`}
+                            >
                               <td className="px-4 py-3 font-medium text-black">{expense.category}</td>
                               <td className="px-4 py-3 text-black">{expense.description || '-'}</td>
                               <td className="px-4 py-3 text-black">{expense.amountMKD?.toFixed(0) || '-'} ден</td>
                               <td className="px-4 py-3 text-black">{new Date(expense.date).toLocaleDateString()}</td>
                               <td className="px-4 py-3 text-black">{expense.paidBy}</td>
                               <td className="px-4 py-3">
+                                <span
+                                  className={`px-2 py-1 rounded text-xs font-semibold ${
+                                    expense.status === 'done'
+                                      ? 'bg-green-100 text-green-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                  }`}
+                                >
+                                  {expense.status === 'done' ? 'Done' : 'Pending'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <button
+                                  onClick={() => toggleExpenseStatus(expense.id, expense.status)}
+                                  className={`text-sm mr-2 ${expense.status === 'done' ? 'text-gray-500 hover:text-gray-700' : 'text-green-600 hover:text-green-800'}`}
+                                  title={expense.status === 'done' ? 'Mark as pending' : 'Mark as done'}
+                                >
+                                  {expense.status === 'done' ? 'Undo' : 'Done'}
+                                </button>
                                 <button
                                   onClick={() => openEditExpenseModal(expense)}
                                   className="text-blue-600 hover:text-blue-800 text-sm mr-2"
