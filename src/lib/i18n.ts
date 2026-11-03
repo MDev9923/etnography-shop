@@ -57,6 +57,11 @@ export const translations: Record<Language, Translation> = {
         low: 'Low',
         parts: 'For Parts/Non Working'
       },
+      common: {
+        search: 'Search products...',
+        addToCart: 'Add to Cart',
+        viewDetails: 'View Details',
+      },
       filmTypes: {
         mm35: '35mm',
         mm120: '120',
@@ -243,6 +248,11 @@ export const translations: Record<Language, Translation> = {
         good: 'Добро',
         low: 'Слабо',
         parts: 'За Делови/Расипани/Полуфункционални'
+      },
+      common: {
+        search: 'Пребарај продукти...',
+        addToCart: 'Додај во кошничка',
+        viewDetails: 'Види детали',
       },
       filmTypes: {
         mm35: '35mm',

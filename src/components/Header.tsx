@@ -3,11 +3,12 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Menu, X, Globe, DollarSign } from 'lucide-react';
+import { Search, Menu, X, Globe, DollarSign, ShoppingBag } from 'lucide-react';
 
 import { getTranslation } from '@/lib/i18n';
 import { useApp } from '@/lib/context';
 import { useAudio } from '@/contexts/AudioContext';
+import { useCart } from '@/contexts/CartContext';
 import { VinylRecord } from './VinylRecord';
 import { ScrollingTitle } from './ScrollingTitle';
 
@@ -21,6 +22,7 @@ const navigation = [
 export function Header() {
   const { language, currency, setLanguage, setCurrency } = useApp();
   const { isMuted, toggleMute, isPlaying, currentTrackTitle } = useAudio();
+  const { cartCount } = useCart();
   const router = useRouter();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -184,6 +186,15 @@ export function Header() {
               <span>{currency}</span>
             </button>
 
+            <Link
+              href="/checkout"
+              className={controlClass}
+              aria-label={language === 'mk' ? 'Кошничка' : 'Cart'}
+            >
+              <ShoppingBag aria-hidden="true" className="h-4 w-4" />
+              <span>{cartCount}</span>
+            </Link>
+
             {/* Desktop music player */}
             <div className="ml-1 flex w-[22rem] min-w-0 items-center gap-2 border-l border-white/15 pl-3">
               <div className="shrink-0">
@@ -321,6 +332,16 @@ export function Header() {
                 <DollarSign aria-hidden="true" className="h-4 w-4" />
                 <span>{currency}</span>
               </button>
+
+              <Link
+                href="/checkout"
+                onClick={() => setIsMenuOpen(false)}
+                className={`${controlClass} flex-1`}
+                aria-label={language === 'mk' ? 'Кошничка' : 'Cart'}
+              >
+                <ShoppingBag aria-hidden="true" className="h-4 w-4" />
+                <span>{cartCount}</span>
+              </Link>
             </div>
           </div>
         )}

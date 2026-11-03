@@ -1,7 +1,8 @@
-import './globals.css'
+//import './globals.css'
 import { Josefin_Sans } from 'next/font/google'
 import { AppProvider } from '@/lib/context'
 import { AudioProvider } from '@/contexts/AudioContext';
+import { CartProvider } from '@/contexts/CartContext';
 
 const josefinSans = Josefin_Sans({ 
   subsets: ['latin'],
@@ -32,7 +33,9 @@ export default function RootLayout({
       <body className={josefinSans.className}>
         <AppProvider>
           <AudioProvider>
-            {children}
+            <CartProvider>
+              {children}
+            </CartProvider>
           </AudioProvider>
         </AppProvider>
       </body>

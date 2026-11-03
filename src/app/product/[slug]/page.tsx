@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useApp } from '@/lib/context';
+import { useCart } from '@/contexts/CartContext';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
 import {
@@ -27,6 +28,7 @@ import {
   Minimize2,
   CreditCard,
   Link,
+  ShoppingCart,
 } from 'lucide-react';
 
 type Product = {
@@ -119,6 +121,7 @@ function getImageUrl(value?: string): string {
 
 export default function ProductPage() {
   const { language, currency } = useApp();
+  const { addToCart } = useCart();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -779,6 +782,26 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                     ? 'Email for Order'
                     : 'Е-пошта за Нарачка'}
                 </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => addToCart({
+                  id: product.id,
+                  slug: product.slug,
+                  name: product.name[language] || product.name.en,
+                  nameEN: product.name.en,
+                  nameMK: product.name.mk,
+                  brand: product.brand,
+                  priceEUR: product.priceEUR,
+                  priceMKD: product.priceMKD,
+                  image: product.images?.[0] ? getImageUrl(product.images[0]) : '/placeholder-product.jpg',
+                })}
+                disabled={isSold}
+                className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-accent transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span>{getTranslation(language, 'common.addToCart')}</span>
               </button>
             </div>
 

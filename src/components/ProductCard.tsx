@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useApp } from '@/lib/context';
+import { useCart } from '@/contexts/CartContext';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
-import { Eye } from 'lucide-react';
+import { Eye, ShoppingCart } from 'lucide-react';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
@@ -67,6 +68,7 @@ export function ProductCard({
   showConditionBadge = true,
 }: ProductCardProps) {
   const { language, currency } = useApp();
+  const { addToCart } = useCart();
 
   const price =
     currency === 'EUR' ? product.priceEUR : product.priceMKD;
@@ -163,16 +165,37 @@ export function ProductCard({
           </span>
         </div>
 
-        <Link
-          href={productUrl}
-          className="mt-auto w-full bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
-        >
-          <Eye className="h-4 w-4" />
+        <div className="flex gap-2 mt-auto">
+          <button
+            onClick={() => addToCart({
+              id: product.id,
+              slug: product.slug,
+              name: productName,
+              nameEN: product.name.en,
+              nameMK: product.name.mk,
+              brand: product.brand,
+              priceEUR: product.priceEUR,
+              priceMKD: product.priceMKD,
+              image: imageUrl,
+            })}
+            className="flex-1 bg-gray-100 text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
+            disabled={isSold}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            <span>{getTranslation(language, 'common.addToCart')}</span>
+          </button>
 
-          <span>
-            {getTranslation(language, 'common.viewDetails')}
-          </span>
-        </Link>
+          <Link
+            href={productUrl}
+            className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
+          >
+            <Eye className="h-4 w-4" />
+
+            <span>
+              {getTranslation(language, 'common.viewDetails')}
+            </span>
+          </Link>
+        </div>
       </div>
     </div>
   );
