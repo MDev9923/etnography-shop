@@ -772,20 +772,6 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
 
               <button
                 type="button"
-                onClick={handleEmailOrder}
-                className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors duration-200 flex items-center justify-center gap-2"
-              >
-                <Mail className="h-5 w-5" />
-
-                <span>
-                  {language === 'en'
-                    ? 'Email for Order'
-                    : 'Е-пошта за Нарачка'}
-                </span>
-              </button>
-
-              <button
-                type="button"
                 onClick={() => addToCart({
                   id: product.id,
                   slug: product.slug,

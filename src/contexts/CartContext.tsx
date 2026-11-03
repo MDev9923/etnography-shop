@@ -51,9 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart((prevCart) => {
       const existingItem = prevCart.find((i) => i.id === item.id);
       if (existingItem) {
-        return prevCart.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
+        return prevCart; // Item already in cart, don't add again
       }
       return [...prevCart, { ...item, quantity: 1, nameEN: item.name, nameMK: item.name }];
     });
@@ -79,13 +77,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const cartTotal = cart.reduce(
     (total, item) => ({
-      EUR: total.EUR + (item.priceEUR || 0) * item.quantity,
-      MKD: total.MKD + (item.priceMKD || 0) * item.quantity,
+      EUR: total.EUR + (item.priceEUR || 0),
+      MKD: total.MKD + (item.priceMKD || 0),
     }),
     { EUR: 0, MKD: 0 }
   );
 
-  const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
+  const cartCount = cart.length;
 
   return (
     <CartContext.Provider

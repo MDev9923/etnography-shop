@@ -8,7 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useApp } from '@/lib/context';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
-import { Trash2, Minus, Plus, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { Trash2, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -24,9 +24,7 @@ export default function CheckoutPage() {
     notes: '',
   });
 
-  const handleQuantityChange = (id: number, newQuantity: number) => {
-    updateQuantity(id, newQuantity);
-  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +34,7 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Generate WhatsApp message
+    // Generate email body
     const message = `
 ${language === 'mk' ? 'Нова нарачка' : 'New Order'}:
 
@@ -46,19 +44,19 @@ ${language === 'mk' ? 'Телефон' : 'Phone'}: ${formData.phone}
 ${language === 'mk' ? 'Адреса' : 'Address'}: ${formData.address}
 
 ${language === 'mk' ? 'Продукти' : 'Products'}:
-${cart.map((item, index) => `${index + 1}. ${language === 'mk' ? item.nameMK : item.nameEN} (${item.brand}) - ${formatPrice(item.priceEUR || item.priceMKD || 0, currency)} x${item.quantity}`).join('\n')}
+${cart.map((item, index) => `${index + 1}. ${item.brand} ${language === 'mk' ? item.nameMK : item.nameEN} - ${currency === 'EUR' ? `€${Math.round(item.priceEUR || 0)}` : `${Math.round(item.priceMKD || 0)} ден`}`).join('\n')}
 
-${language === 'mk' ? 'Вкупно' : 'Total'}: ${formatPrice(cartTotal.EUR || cartTotal.MKD || 0, currency)}
+${language === 'mk' ? 'Вкупно' : 'Total'}: ${currency === 'EUR' ? `€${Math.round(cartTotal.EUR || 0)}` : `${Math.round(cartTotal.MKD || 0)} ден`}
 
 ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
     `.trim();
 
-    // WhatsApp message encoding
-    const whatsappNumber = '38970123456'; // Replace with actual WhatsApp number
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    // Open email client
+    const subject = encodeURIComponent(language === 'mk' ? 'Нова нарачка - Etnography' : 'New Order - Etnography');
+    const body = encodeURIComponent(message);
+    const emailUrl = `mailto:contact@etnography.com?subject=${subject}&body=${body}`;
 
-    // Open WhatsApp
-    window.open(whatsappUrl, '_blank');
+    window.location.href = emailUrl;
 
     // Clear cart after successful order
     clearCart();
@@ -116,33 +114,19 @@ ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
                   className="h-24 w-24 object-cover rounded"
                 />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                  <p className="text-sm text-gray-600">{item.brand}</p>
+                  <h3 className="font-semibold text-gray-900">{item.brand} {item.name}</h3>
                   <p className="text-lg font-bold text-gray-900 mt-2">
-                    {formatPrice(item.priceEUR || item.priceMKD || 0, currency)}
+                    {currency === 'EUR'
+                      ? `€${Math.round(item.priceEUR || 0)}`
+                      : `${Math.round(item.priceMKD || 0)} ден`}
                   </p>
                 </div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                      className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                      className="w-8 h-8 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-100"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
+                <div className="flex items-center">
                   <button
                     onClick={() => removeFromCart(item.id)}
                     className="text-red-600 hover:text-red-800"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
               </div>
@@ -166,7 +150,7 @@ ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
                   />
                 </div>
 
@@ -179,7 +163,7 @@ ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
                   />
                 </div>
 
@@ -192,7 +176,7 @@ ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
                   />
                 </div>
 
@@ -204,7 +188,7 @@ ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
                     type="text"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
                   />
                 </div>
 
@@ -216,21 +200,25 @@ ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
                     rows={3}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-gray-900"
                   />
                 </div>
 
                 <div className="border-t pt-4 mt-4">
                   <div className="flex justify-between text-lg font-bold text-gray-900 mb-4">
                     <span>{language === 'mk' ? 'Вкупно' : 'Total'}</span>
-                    <span>{formatPrice(cartTotal.EUR || cartTotal.MKD || 0, currency)}</span>
+                    <span>
+                      {currency === 'EUR'
+                        ? `€${Math.round(cartTotal.EUR || 0)}`
+                        : `${Math.round(cartTotal.MKD || 0)} ден`}
+                    </span>
                   </div>
 
                   <button
                     type="submit"
                     className="w-full bg-gray-900 text-white py-3 rounded-lg hover:bg-gray-800 font-medium"
                   >
-                    {language === 'mk' ? 'Порачај преку WhatsApp' : 'Order via WhatsApp'}
+                    {language === 'mk' ? 'Порачај преку Email' : 'Order via Email'}
                   </button>
                 </div>
               </form>
