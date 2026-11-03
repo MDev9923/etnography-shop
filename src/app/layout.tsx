@@ -1,4 +1,4 @@
-//import './globals.css'
+import './globals.css'
 import { Josefin_Sans } from 'next/font/google'
 import { AppProvider } from '@/lib/context'
 import { AudioProvider } from '@/contexts/AudioContext';

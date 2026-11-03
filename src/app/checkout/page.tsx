@@ -6,7 +6,8 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useCart } from '@/contexts/CartContext';
 import { useApp } from '@/lib/context';
-import { getTranslation, formatPrice } from '@/lib/i18n';
+import { getTranslation } from '@/lib/i18n';
+import { formatPrice } from '@/lib/utils';
 import { Trash2, Minus, Plus, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 
@@ -53,7 +54,7 @@ ${language === 'mk' ? 'Белешки' : 'Notes'}: ${formData.notes || '-'}
     `.trim();
 
     // WhatsApp message encoding
-    const whatsappNumber = '38970123456'; // Replace with actual number
+    const whatsappNumber = '38970123456'; // Replace with actual WhatsApp number
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
     // Open WhatsApp
