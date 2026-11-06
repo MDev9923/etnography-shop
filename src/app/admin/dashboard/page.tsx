@@ -267,15 +267,39 @@ export default function AdminDashboard() {
     dateTo: '',
     purchasedBy: '',
     visible: '',
-    expenseDateFrom: '',
-    expenseDateTo: '',
+    expenseDateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    expenseDateTo: new Date().toISOString().split('T')[0],
     expensePaidBy: ''
   });
 
   const fetchFinancialSummary = useCallback(async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const response = await fetch(`${API_URL}/api/admin/financial-summary`, {
+      const params = new URLSearchParams();
+
+      if (soldFilters.expenseDateFrom) {
+        params.append('expenseDateFrom', soldFilters.expenseDateFrom);
+      }
+      if (soldFilters.expenseDateTo) {
+        params.append('expenseDateTo', soldFilters.expenseDateTo);
+      }
+      if (soldFilters.expensePaidBy) {
+        params.append('expensePaidBy', soldFilters.expensePaidBy);
+      }
+      if (soldFilters.dateFrom) {
+        params.append('dateFrom', soldFilters.dateFrom);
+      }
+      if (soldFilters.dateTo) {
+        params.append('dateTo', soldFilters.dateTo);
+      }
+      if (soldFilters.purchasedBy) {
+        params.append('purchasedBy', soldFilters.purchasedBy);
+      }
+      if (soldFilters.visible) {
+        params.append('visible', soldFilters.visible);
+      }
+
+      const response = await fetch(`${API_URL}/api/admin/financial-summary?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -290,7 +314,7 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error('Failed to fetch financial summary:', err);
     }
-  }, []);
+  }, [soldFilters]);
 
   const addExpense = async (category: string, description: string, amountEUR: string, amountMKD: string, date: string, paidBy: string) => {
     const token = localStorage.getItem('adminToken');
@@ -931,8 +955,8 @@ export default function AdminDashboard() {
                       dateTo: '',
                       purchasedBy: '',
                       visible: '',
-                      expenseDateFrom: '',
-                      expenseDateTo: '',
+                      expenseDateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                      expenseDateTo: new Date().toISOString().split('T')[0],
                       expensePaidBy: ''
                     })}
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
@@ -968,6 +992,14 @@ export default function AdminDashboard() {
                       <p className="text-sm text-gray-600">Гого Вкупно</p>
                       <p className="text-lg font-bold text-black">{financialSummary.summary.gogoTotalMKD.toFixed(0)} ден</p>
                     </div>
+                    <div className="bg-red-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Трошоци (Матеј)</p>
+                      <p className="text-lg font-bold text-black">{financialSummary.summary.matejExpensesMKD.toFixed(0)} ден</p>
+                    </div>
+                    <div className="bg-red-50 p-4 rounded-lg">
+                      <p className="text-sm text-gray-600">Трошоци (Гого)</p>
+                      <p className="text-lg font-bold text-black">{financialSummary.summary.gogoExpensesMKD.toFixed(0)} ден</p>
+                    </div>
                   </div>
                 </div>
 
@@ -988,16 +1020,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {financialSummary.products
-                          .filter((product: any) => {
-                            if (soldFilters.purchasedBy && product.purchasedBy !== soldFilters.purchasedBy) return false;
-                            if (soldFilters.dateFrom && product.soldDate && product.soldDate < soldFilters.dateFrom) return false;
-                            if (soldFilters.dateTo && product.soldDate && product.soldDate > soldFilters.dateTo) return false;
-                            if (soldFilters.visible === 'visible' && !product.visible_in_catalog) return false;
-                            if (soldFilters.visible === 'hidden' && product.visible_in_catalog) return false;
-                            return true;
-                          })
-                          .map((product: any) => (
+                        {financialSummary.products.map((product: any) => (
                           <tr key={product.id} className="hover:bg-gray-50">
                             <td className="px-4 py-3 font-medium text-black">{product.name}</td>
                             <td className="px-4 py-3 text-black">{product.sellingPriceMKD?.toFixed(0) || '-'} ден</td>
@@ -1048,14 +1071,7 @@ export default function AdminDashboard() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {financialSummary.expenses
-                            .filter((expense: any) => {
-                              if (soldFilters.expensePaidBy && expense.paidBy !== soldFilters.expensePaidBy) return false;
-                              if (soldFilters.expenseDateFrom && expense.date < soldFilters.expenseDateFrom) return false;
-                              if (soldFilters.expenseDateTo && expense.date > soldFilters.expenseDateTo) return false;
-                              return true;
-                            })
-                            .map((expense: any) => (
+                          {financialSummary.expenses.map((expense: any) => (
                             <tr
                               key={expense.id}
                               className={`hover:bg-gray-50 ${expense.status === 'done' ? 'bg-gray-100 opacity-60' : ''}`}

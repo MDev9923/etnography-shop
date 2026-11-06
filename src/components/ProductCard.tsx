@@ -80,7 +80,7 @@ export function ProductCard({
 
   const conditionText = getTranslation(
     language,
-    `catalog.conditions.${product.condition.replace(/\s+/g, '')}`
+    `catalog.conditions.${product.condition.replace(/-/g, '').replace(/\s+/g, '')}`
   );
 
   const isSold = product.status === 'sold';
@@ -127,7 +127,7 @@ export function ProductCard({
                 : 'bg-green-100 text-green-800'
             }`}
           >
-            {isSold ? 'SOLD' : 'AVAILABLE'}
+            {isSold ? getTranslation(language, 'common.sold') : getTranslation(language, 'common.available')}
           </div>
         </div>
       </Link>

@@ -61,6 +61,8 @@ export const translations: Record<Language, Translation> = {
         search: 'Search products...',
         addToCart: 'Add to Cart',
         viewDetails: 'View Details',
+        available: 'Available',
+        sold: 'Sold',
       },
       filmTypes: {
         mm35: '35mm',
@@ -253,6 +255,8 @@ export const translations: Record<Language, Translation> = {
         search: 'Пребарај продукти...',
         addToCart: 'Додај во кошничка',
         viewDetails: 'Види детали',
+        available: 'Достапно',
+        sold: 'Продадено',
       },
       filmTypes: {
         mm35: '35mm',
