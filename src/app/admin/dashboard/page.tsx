@@ -878,9 +878,7 @@ export default function AdminDashboard() {
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-bold mb-4 text-black">Филтри</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* Product Filters */}
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm text-gray-700">Продажби</h4>
                   <label className="block text-xs text-gray-600">Датум од</label>
                   <input
                     type="date"
@@ -918,24 +916,22 @@ export default function AdminDashboard() {
                   </select>
                 </div>
 
-                {/* Expense Filters */}
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm text-gray-700">Трошоци</h4>
-                  <label className="block text-xs text-gray-600">Датум од</label>
+                  <label className="block text-xs text-gray-600">Датум од (Трошоци)</label>
                   <input
                     type="date"
                     value={soldFilters.expenseDateFrom}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateFrom: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   />
-                  <label className="block text-xs text-gray-600">Датум до</label>
+                  <label className="block text-xs text-gray-600">Датум до (Трошоци)</label>
                   <input
                     type="date"
                     value={soldFilters.expenseDateTo}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateTo: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   />
-                  <label className="block text-xs text-gray-600">Платено од</label>
+                  <label className="block text-xs text-gray-600">Платено од (Трошоци)</label>
                   <select
                     value={soldFilters.expensePaidBy}
                     onChange={(e) => setSoldFilters(prev => ({ ...prev, expensePaidBy: e.target.value }))}
@@ -947,8 +943,7 @@ export default function AdminDashboard() {
                   </select>
                 </div>
 
-                {/* Clear Filters */}
-                <div className="flex items-end">
+                <div className="flex items-end gap-2">
                   <button
                     onClick={() => setSoldFilters({
                       dateFrom: '',
@@ -962,6 +957,12 @@ export default function AdminDashboard() {
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
                   >
                     Исчисти Филтри
+                  </button>
+                  <button
+                    onClick={() => void fetchFinancialSummary()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                  >
+                    Примени Филтри
                   </button>
                 </div>
               </div>

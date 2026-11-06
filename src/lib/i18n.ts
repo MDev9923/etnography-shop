@@ -49,6 +49,13 @@ export const translations: Record<Language, Translation> = {
         digital: 'Digital',
         both: 'Both'
       },
+      common: {
+        search: 'Search products...',
+        addToCart: 'Add to Cart',
+        viewDetails: 'View Details',
+        available: 'Available',
+        sold: 'Sold',
+      },
       conditions: {
         likeNew: 'Like New',
         excellent: 'Excellent',
@@ -56,13 +63,6 @@ export const translations: Record<Language, Translation> = {
         good: 'Good',
         low: 'Low',
         parts: 'For Parts/Non Working'
-      },
-      common: {
-        search: 'Search products...',
-        addToCart: 'Add to Cart',
-        viewDetails: 'View Details',
-        available: 'Available',
-        sold: 'Sold',
       },
       filmTypes: {
         mm35: '35mm',
@@ -243,6 +243,13 @@ export const translations: Record<Language, Translation> = {
         both: 'Двете',
         analog: 'Аналогно'
       },
+      common: {
+        search: 'Пребарај продукти...',
+        addToCart: 'Додај во кошничка',
+        viewDetails: 'Види детали',
+        available: 'Достапно',
+        sold: 'Продадено',
+      },
       conditions: {
         likeNew: 'Како Ново',
         excellent: 'Одлично',
@@ -250,13 +257,6 @@ export const translations: Record<Language, Translation> = {
         good: 'Добро',
         low: 'Слабо',
         parts: 'За Делови/Расипани/Полуфункционални'
-      },
-      common: {
-        search: 'Пребарај продукти...',
-        addToCart: 'Додај во кошничка',
-        viewDetails: 'Види детали',
-        available: 'Достапно',
-        sold: 'Продадено',
       },
       filmTypes: {
         mm35: '35mm',
