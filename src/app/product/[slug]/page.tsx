@@ -515,7 +515,7 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                   </span>
                   {(product.quantity ?? 1) > 1 && (
                     <span className="ml-2 text-sm text-gray-500">
-                      ({product.quantity} {language === 'en' ? 'available' : 'достапно'})
+                      ({product.quantity} {getTranslation(language, 'catalog.common.available').toLowerCase()})
                     </span>
                   )}
                 </div>
@@ -768,14 +768,14 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
             {(product.quantity ?? 1) > 1 && (
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {language === 'en' ? 'Quantity' : 'Количина'}
+                  {getTranslation(language, 'common.quantity')}
                 </label>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setCartQuantity(Math.max(1, cartQuantity - 1))}
                     disabled={cartQuantity <= 1}
-                    className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900"
                   >
                     <Minus className="h-4 w-4" />
                   </button>
@@ -788,13 +788,13 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                       const val = Math.min(product.quantity ?? 1, Math.max(1, Number(e.target.value)));
                       setCartQuantity(val);
                     }}
-                    className="w-20 text-center border border-gray-300 rounded-lg px-3 py-2"
+                    className="w-20 text-center border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
                   />
                   <button
                     type="button"
                     onClick={() => setCartQuantity(Math.min(product.quantity ?? 1, cartQuantity + 1))}
                     disabled={cartQuantity >= (product.quantity ?? 1)}
-                    className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900"
                   >
                     <Plus className="h-4 w-4" />
                   </button>

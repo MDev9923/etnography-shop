@@ -213,7 +213,7 @@ export default function CatalogPage() {
               : 'bg-card text-foreground border border-border hover:bg-muted'
           }`}
         >
-          {language === 'en' ? 'Show sold' : 'Прикажи продадени'}
+          {getTranslation(language, 'common.showSold')}
         </button>
       </div>
 
@@ -250,7 +250,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {language === 'en' ? 'All Brands' : 'Сите Брендови'}
+            {getTranslation(language, 'common.allBrands')}
           </option>
 
           {uniqueBrands.map((brand) => (
@@ -280,7 +280,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {language === 'en' ? 'All Categories' : 'Сите Категории'}
+            {getTranslation(language, 'common.allCategories')}
           </option>
           <option value="camera">
             {getTranslation(language, 'catalog.categories.camera')}
@@ -312,7 +312,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {language === 'en' ? 'All Types' : 'Сите Типови'}
+            {getTranslation(language, 'common.allTypes')}
           </option>
           <option value="film">
             {getTranslation(language, 'catalog.types.film')}
@@ -342,7 +342,7 @@ export default function CatalogPage() {
             className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
           >
             <option value="">
-              {language === 'en' ? 'All Film Types' : 'Сите типови филм'}
+              {getTranslation(language, 'common.allFilmTypes')}
             </option>
             <option value="35mm">
               {getTranslation(language, 'catalog.filmTypes.mm35')}
@@ -418,7 +418,7 @@ export default function CatalogPage() {
             className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
           >
             <option value="">
-              {language === 'en' ? 'All Mounts' : 'Сите Монти'}
+              {getTranslation(language, 'common.allMounts')}
             </option>
 
             {uniqueMounts.map((mount) => (
@@ -445,7 +445,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {language === 'en' ? 'All Conditions' : 'Сите Состојби'}
+            {getTranslation(language, 'common.allConditions')}
           </option>
           <option value="like-new">
             {getTranslation(language, 'catalog.conditions.likeNew')}
@@ -485,7 +485,7 @@ export default function CatalogPage() {
               setFilters((prev) => ({ ...prev, minPrice: value }));
             }}
             className="w-1/2 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
-            placeholder={language === 'en' ? 'Min' : 'Мин'}
+            placeholder={getTranslation(language, 'common.min')}
           />
 
           <input
@@ -496,7 +496,7 @@ export default function CatalogPage() {
               setFilters((prev) => ({ ...prev, maxPrice: value }));
             }}
             className="w-1/2 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
-            placeholder={language === 'en' ? 'Max' : 'Макс'}
+            placeholder={getTranslation(language, 'common.max')}
           />
         </div>
       </div>
