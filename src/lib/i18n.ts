@@ -101,6 +101,17 @@ export const translations: Record<Language, Translation> = {
       maxMemoryCapacity: 'Maximum Memory Card Capacity',
       internalMemory: 'Internal Memory',
       filmFormat: 'Film Format',
+      batteryTypes: {
+        aa: 'AA',
+        aaa: 'AAA',
+        cr123a: 'CR123A',
+        cr2: 'cr2',
+        lr44: 'LR44',
+        proprietary: 'Proprietary rechargeable',
+        builtin: 'Built-in rechargeable',
+        none: 'No battery required',
+        custom: 'Other'
+      },
       conditions: {
         likeNew: 'Like New',
         excellent: 'Excellent',
@@ -295,6 +306,17 @@ export const translations: Record<Language, Translation> = {
       maxMemoryCapacity: 'Максимален капацитет на мемориска картичка',
       internalMemory: 'Внатрешна меморија',
       filmFormat: 'Формат на филм',
+      batteryTypes: {
+        aa: 'AA',
+        aaa: 'AAA',
+        cr123a: 'CR123A',
+        cr2: 'cr2',
+        lr44: 'LR44',
+        proprietary: 'Посебна полначка',
+        builtin: 'Вградена полначка',
+        none: 'Не бара батерија',
+        custom: 'Друго'
+      },
       conditions: {
         likeNew: 'Како Ново',
         excellent: 'Одлично',

@@ -83,6 +83,8 @@ interface Product {
     name_mk: string;
     detail: string;
   }>;
+
+  quantity?: number;
 }
 
 interface ProductForm {
@@ -111,6 +113,7 @@ interface ProductForm {
   purchased_by_note: string;
   general_note: string;
   visible_in_catalog: boolean;
+  quantity: string;
   // Camera specifications
   megapixels: string;
   battery_type: string;
@@ -153,6 +156,7 @@ function createEmptyForm(): ProductForm {
     purchased_by_note: '',
     general_note: '',
     visible_in_catalog: true,
+    quantity: '1',
     megapixels: '',
     battery_type: '',
     memory_type: '',
@@ -542,9 +546,9 @@ export default function AdminDashboard() {
 
   async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
     const input = e.currentTarget;
-    const file = input.files?.[0];
+    const files = Array.from(input.files || []);
 
-    if (!file) return;
+    if (files.length === 0) return;
 
     const token = localStorage.getItem('adminToken');
 
@@ -556,35 +560,39 @@ export default function AdminDashboard() {
     setUploadingImage(true);
 
     try {
-      const uploadData = new FormData();
-      uploadData.append('file', file);
+      const uploadPromises = files.map(async (file) => {
+        const uploadData = new FormData();
+        uploadData.append('file', file);
 
-      const response = await fetch(`${API_URL}/api/upload`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: uploadData,
+        const response = await fetch(`${API_URL}/api/upload`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: uploadData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || data.message || 'Image upload failed'
+          );
+        }
+
+        if (typeof data.url !== 'string' || !data.url.trim()) {
+          throw new Error('The upload response did not contain an image URL');
+        }
+
+        // R2 returns a complete URL. Do not prepend API_URL.
+        return getImageUrl(data.url);
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error || data.message || 'Image upload failed'
-        );
-      }
-
-      if (typeof data.url !== 'string' || !data.url.trim()) {
-        throw new Error('The upload response did not contain an image URL');
-      }
-
-      // R2 returns a complete URL. Do not prepend API_URL.
-      const imageUrl = getImageUrl(data.url);
+      const imageUrls = await Promise.all(uploadPromises);
 
       setFormData((previous) => ({
         ...previous,
-        images: [...previous.images, imageUrl],
+        images: [...previous.images, ...imageUrls],
       }));
     } catch (err) {
       alert(
@@ -650,6 +658,14 @@ export default function AdminDashboard() {
         purchasedByNote: formData.purchased_by_note || null,
         generalNote: formData.general_note || null,
         visibleInCatalog: formData.visible_in_catalog,
+        quantity: (() => {
+          const qty = formData.quantity === '' ? 1 : Number(formData.quantity);
+          // If marking as sold and editing a product with quantity > 1, decrement
+          if (editingProduct && formData.status === 'sold' && editingProduct.status !== 'sold' && qty > 1) {
+            return qty - 1;
+          }
+          return qty;
+        })(),
         // Camera specifications
         megapixels: formData.megapixels || null,
         batteryType: formData.battery_type || null,
@@ -724,6 +740,7 @@ export default function AdminDashboard() {
       purchased_by_note: product.purchased_by_note || '',
       general_note: product.general_note || '',
       visible_in_catalog: product.visible_in_catalog === 1,
+      quantity: product.quantity == null ? '1' : String(product.quantity),
       megapixels: product.megapixels || '',
       battery_type: product.batteryType || '',
       memory_type: product.memoryType || '',
@@ -1585,6 +1602,23 @@ export default function AdminDashboard() {
                     className={`${inputClass} mt-1`}
                   />
                 </label>
+
+                <label className="block text-sm font-medium text-gray-700">
+                  Quantity
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={formData.quantity}
+                    onChange={(e) =>
+                      setFormData((previous) => ({
+                        ...previous,
+                        quantity: e.target.value,
+                      }))
+                    }
+                    className={`${inputClass} mt-1`}
+                  />
+                </label>
               </div>
 
               <label className="block text-sm font-medium text-gray-700">
@@ -1627,6 +1661,7 @@ export default function AdminDashboard() {
                     type="file"
                     id="image-upload"
                     accept="image/jpeg,image/png,image/webp,image/gif"
+                    multiple
                     onChange={handleImageUpload}
                     disabled={uploadingImage || saving}
                     className="hidden"
@@ -1642,11 +1677,11 @@ export default function AdminDashboard() {
                     <Upload className="h-8 w-8" />
                     <span>
                       {uploadingImage
-                        ? 'Uploading image...'
-                        : 'Click to upload an image'}
+                        ? 'Uploading images...'
+                        : 'Click to upload images'}
                     </span>
                     <span className="text-xs text-gray-500">
-                      JPEG, PNG, WebP or GIF. Maximum 10 MB.
+                      JPEG, PNG, WebP or GIF. Maximum 10 MB per image. Multiple files allowed.
                     </span>
                   </label>
                 </div>

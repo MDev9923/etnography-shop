@@ -327,7 +327,7 @@ export default function CatalogPage() {
       </div>
 
       {/* Film Type Filter */}
-      {filters.category === 'film' && (
+      {(filters.category === 'film' || (filters.category === 'camera' && (filters.filmDigital === 'film' || filters.filmDigital === 'analog'))) && (
         <div className="mb-6">
           <label className="block text-sm font-medium text-foreground mb-2">
             {getTranslation(language, 'catalog.filterBy.filmType')}

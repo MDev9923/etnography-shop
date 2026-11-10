@@ -56,6 +56,7 @@ interface Product {
   };
   specs: Record<string, unknown>;
   images: string[];
+  quantity?: number;
 }
 
 interface ProductCardProps {
@@ -80,7 +81,7 @@ export function ProductCard({
 
   const conditionText = getTranslation(
     language,
-    `catalog.conditions.${product.condition.replace(/-/g, '').replace(/\s+/g, '')}`
+    `catalog.conditions.${product.condition.replace(/-([a-z])/g, (_, c) => c.toUpperCase()).replace(/\s+/g, '')}`
   );
 
   const availableText = getTranslation(language, 'catalog.common.available');
@@ -160,12 +161,19 @@ export function ProductCard({
             {formattedPrice}
           </span>
 
-          <span className="text-sm text-gray-500 capitalize">
-            {getTranslation(
-              language,
-              `catalog.categories.${product.category}`
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-sm text-gray-500 capitalize">
+              {getTranslation(
+                language,
+                `catalog.categories.${product.category}`
+              )}
+            </span>
+            {(product.quantity ?? 1) > 1 && (
+              <span className="text-xs text-gray-400">
+                Qty: {product.quantity}
+              </span>
             )}
-          </span>
+          </div>
         </div>
 
         <Link
