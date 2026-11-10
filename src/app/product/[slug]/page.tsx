@@ -29,6 +29,8 @@ import {
   CreditCard,
   Link,
   ShoppingCart,
+  Minus,
+  Plus,
 } from 'lucide-react';
 
 type Product = {
@@ -64,6 +66,7 @@ type Product = {
     name_mk: string;
     detail: string;
   }>;
+  quantity?: number;
 };
 
 const API_URL = (
@@ -121,7 +124,7 @@ function getImageUrl(value?: string): string {
 
 export default function ProductPage() {
   const { language, currency } = useApp();
-  const { addToCart } = useCart();
+  const { addToCart, updateQuantity } = useCart();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -129,10 +132,18 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'specifications' | 'included'>('specifications');
+  const [cartQuantity, setCartQuantity] = useState(1);
 
   const product = allProducts.find(
     (item) => String(item.slug) === slug
   );
+
+  // Reset cart quantity when product changes
+  useEffect(() => {
+    if (product) {
+      setCartQuantity(1);
+    }
+  }, [product?.id]);
 
   useEffect(() => {
     let active = true;
@@ -498,9 +509,16 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
               </h1>
 
               <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-                <span className="text-3xl font-bold text-gray-900">
-                  {formattedPrice}
-                </span>
+                <div>
+                  <span className="text-3xl font-bold text-gray-900">
+                    {formattedPrice}
+                  </span>
+                  {(product.quantity ?? 1) > 1 && (
+                    <span className="ml-2 text-sm text-gray-500">
+                      ({product.quantity} {language === 'en' ? 'available' : 'достапно'})
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex items-center flex-wrap gap-2">
                   <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -746,6 +764,44 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
               )}
             </div>
 
+            {/* Quantity Selector */}
+            {(product.quantity ?? 1) > 1 && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {language === 'en' ? 'Quantity' : 'Количина'}
+                </label>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCartQuantity(Math.max(1, cartQuantity - 1))}
+                    disabled={cartQuantity <= 1}
+                    className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    max={product.quantity}
+                    value={cartQuantity}
+                    onChange={(e) => {
+                      const val = Math.min(product.quantity ?? 1, Math.max(1, Number(e.target.value)));
+                      setCartQuantity(val);
+                    }}
+                    className="w-20 text-center border border-gray-300 rounded-lg px-3 py-2"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCartQuantity(Math.min(product.quantity ?? 1, cartQuantity + 1))}
+                    disabled={cartQuantity >= (product.quantity ?? 1)}
+                    className="w-10 h-10 rounded-lg border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="button"
@@ -772,17 +828,24 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
 
               <button
                 type="button"
-                onClick={() => addToCart({
-                  id: product.id,
-                  slug: product.slug,
-                  name: product.name[language] || product.name.en,
-                  nameEN: product.name.en,
-                  nameMK: product.name.mk,
-                  brand: product.brand,
-                  priceEUR: product.priceEUR,
-                  priceMKD: product.priceMKD,
-                  image: product.images?.[0] ? getImageUrl(product.images[0]) : '/placeholder-product.jpg',
-                })}
+                onClick={() => {
+                  // Add single item with quantity
+                  addToCart({
+                    id: product.id,
+                    slug: product.slug,
+                    name: product.name[language] || product.name.en,
+                    nameEN: product.name.en,
+                    nameMK: product.name.mk,
+                    brand: product.brand,
+                    priceEUR: product.priceEUR,
+                    priceMKD: product.priceMKD,
+                    image: product.images?.[0] ? getImageUrl(product.images[0]) : '/placeholder-product.jpg',
+                  });
+                  // If quantity > 1, update it
+                  if (cartQuantity > 1) {
+                    updateQuantity(product.id, cartQuantity);
+                  }
+                }}
                 disabled={isSold}
                 className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-accent transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >

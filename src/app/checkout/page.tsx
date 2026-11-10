@@ -8,7 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useApp } from '@/lib/context';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
-import { Trash2, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { Trash2, ArrowLeft, ShoppingBag, Minus, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -60,7 +60,7 @@ export default function CheckoutPage() {
       formData.address || '-',
       '',
       language === 'mk' ? 'Продукти:' : 'Products:',
-      ...cart.map((item, index) => `${index + 1}. ${item.brand} ${language === 'mk' ? item.nameMK : item.nameEN} - ${currency === 'EUR' ? `€${Math.round(item.priceEUR || 0)}` : `${Math.round(item.priceMKD || 0)} ден`}`),
+      ...cart.map((item, index) => `${index + 1}. ${item.brand} ${language === 'mk' ? item.nameMK : item.nameEN} x${item.quantity} - ${currency === 'EUR' ? `€${Math.round((item.priceEUR || 0) * item.quantity)}` : `${Math.round((item.priceMKD || 0) * item.quantity)} ден`}`),
       '',
       language === 'mk' ? 'Вкупно:' : 'Total:',
       currency === 'EUR' ? `€${Math.round(cartTotal.EUR || 0)}` : `${Math.round(cartTotal.MKD || 0)} ден`,
@@ -170,6 +170,22 @@ export default function CheckoutPage() {
                       ? `€${Math.round(item.priceEUR || 0)}`
                       : `${Math.round(item.priceMKD || 0)} ден`}
                   </p>
+                  <div className="flex items-center gap-2 mt-3">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      disabled={item.quantity <= 1}
+                      className="w-8 h-8 rounded border border-white/20 flex items-center justify-center hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed text-white"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="text-white w-8 text-center">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="w-8 h-8 rounded border border-white/20 flex items-center justify-center hover:bg-white/10 text-white"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
                 <div className="flex items-center">
                   <button

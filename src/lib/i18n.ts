@@ -47,7 +47,8 @@ export const translations: Record<Language, Translation> = {
       types: {
         film: 'Film',
         digital: 'Digital',
-        both: 'Both'
+        both: 'Both',
+        analog: 'Analog'
       },
       common: {
         search: 'Search products...',
