@@ -252,8 +252,8 @@ export default function ProductPage() {
 
   const conditionText = getTranslation(
     language,
-    `catalog.conditions.${product.condition.replace(/\s+/g, '')}`
-  );
+    `catalog.conditions.${product.condition.replace(/-([a-z])/g, (_, c) => c.toUpperCase()).replace(/\s+/g, '')}`
+  ) || product.condition;
 
   const categoryText = getTranslation(
     language,

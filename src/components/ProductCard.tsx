@@ -82,7 +82,7 @@ export function ProductCard({
   const conditionText = getTranslation(
     language,
     `catalog.conditions.${product.condition.replace(/-([a-z])/g, (_, c) => c.toUpperCase()).replace(/\s+/g, '')}`
-  );
+  ) || product.condition;
 
   const availableText = getTranslation(language, 'catalog.common.available');
   const soldText = getTranslation(language, 'catalog.common.sold');
