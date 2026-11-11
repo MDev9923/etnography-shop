@@ -250,7 +250,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {getTranslation(language, 'common.allBrands')}
+            {getTranslation(language, 'catalog.common.allBrands')}
           </option>
 
           {uniqueBrands.map((brand) => (
@@ -280,7 +280,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {getTranslation(language, 'common.allCategories')}
+            {getTranslation(language, 'catalog.common.allCategories')}
           </option>
           <option value="camera">
             {getTranslation(language, 'catalog.categories.camera')}
@@ -312,7 +312,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {getTranslation(language, 'common.allTypes')}
+            {getTranslation(language, 'catalog.common.allTypes')}
           </option>
           <option value="film">
             {getTranslation(language, 'catalog.types.film')}
@@ -342,7 +342,7 @@ export default function CatalogPage() {
             className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
           >
             <option value="">
-              {getTranslation(language, 'common.allFilmTypes')}
+              {getTranslation(language, 'catalog.common.allFilmTypes')}
             </option>
             <option value="35mm">
               {getTranslation(language, 'catalog.filmTypes.mm35')}
@@ -418,7 +418,7 @@ export default function CatalogPage() {
             className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
           >
             <option value="">
-              {getTranslation(language, 'common.allMounts')}
+              {getTranslation(language, 'catalog.common.allMounts')}
             </option>
 
             {uniqueMounts.map((mount) => (
@@ -445,7 +445,7 @@ export default function CatalogPage() {
           className="w-full px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
         >
           <option value="">
-            {getTranslation(language, 'common.allConditions')}
+            {getTranslation(language, 'catalog.common.allConditions')}
           </option>
           <option value="like-new">
             {getTranslation(language, 'catalog.conditions.likeNew')}
@@ -485,7 +485,7 @@ export default function CatalogPage() {
               setFilters((prev) => ({ ...prev, minPrice: value }));
             }}
             className="w-1/2 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
-            placeholder={getTranslation(language, 'common.min')}
+            placeholder={getTranslation(language, 'catalog.common.min')}
           />
 
           <input
@@ -496,7 +496,7 @@ export default function CatalogPage() {
               setFilters((prev) => ({ ...prev, maxPrice: value }));
             }}
             className="w-1/2 px-3 py-2 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
-            placeholder={getTranslation(language, 'common.max')}
+            placeholder={getTranslation(language, 'catalog.common.max')}
           />
         </div>
       </div>
