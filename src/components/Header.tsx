@@ -192,7 +192,8 @@ export function Header() {
               aria-label={language === 'mk' ? 'Кошничка' : 'Cart'}
             >
               <ShoppingBag aria-hidden="true" className="h-4 w-4" />
-              <span>{cartCount}</span>
+              <span className="hidden sm:inline">{language === 'mk' ? 'Кошничка' : 'Cart'}</span>
+              <span className="inline sm:hidden">{cartCount}</span>
             </Link>
 
             {/* Desktop music player */}
@@ -340,7 +341,8 @@ export function Header() {
                 aria-label={language === 'mk' ? 'Кошничка' : 'Cart'}
               >
                 <ShoppingBag aria-hidden="true" className="h-4 w-4" />
-                <span>{cartCount}</span>
+                <span>{language === 'mk' ? 'Кошничка' : 'Cart'}</span>
+                <span className="ml-1">({cartCount})</span>
               </Link>
             </div>
           </div>
