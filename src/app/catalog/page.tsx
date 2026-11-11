@@ -577,7 +577,7 @@ export default function CatalogPage() {
                       type="button"
                       onClick={() => setIsFilterOpen(false)}
                       className="p-2 hover:bg-muted rounded-lg transition-colors"
-                      aria-label={language === 'en' ? 'Close filters' : 'Затвори филтри'}
+                      aria-label={getTranslation(language, 'common.closeFilters')}
                     >
                       <X className="h-5 w-5 text-foreground" />
                     </button>

@@ -322,7 +322,7 @@ export default function ProductPage() {
 
     const body = encodeURIComponent(
       [
-        language === 'en' ? 'Hello,' : 'Здраво,',
+        getTranslation(language, 'common.hello'),
         '',
         language === 'en'
           ? `I'm interested in purchasing: ${productName}${
@@ -860,9 +860,7 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
 
                 <div>
                   <h4 className="text-sm font-semibold text-foreground mb-1">
-                    {language === 'en'
-                      ? 'How to Purchase'
-                      : 'Како да купите'}
+                    {getTranslation(language, 'common.howToPurchase')}
                   </h4>
 
                   <p className="text-sm text-muted-foreground">

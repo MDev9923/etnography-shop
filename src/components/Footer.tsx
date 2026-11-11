@@ -98,7 +98,7 @@ export function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
-            © 2024 {getTranslation(language, 'about.title')}. {language === 'en' ? 'All rights reserved.' : 'Сите права се задржани.'}
+            © 2024 {getTranslation(language, 'about.title')}. {getTranslation(language, 'common.allRightsReserved')}
           </p>
         </div>
       </div>

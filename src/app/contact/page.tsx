@@ -91,7 +91,7 @@ export default function ContactPage() {
             {/* Contact Form */}
             <div className="bg-card p-8 rounded-lg shadow-md border border-border">
               <h2 className="text-2xl font-bold text-foreground mb-6">
-                {language === 'en' ? 'Send us a Message' : 'Испратете ни Порака'}
+                {getTranslation(language, 'common.sendMessage')}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -107,7 +107,7 @@ export default function ContactPage() {
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
-                    placeholder={language === 'en' ? 'Your Name' : 'Вашето Име'}
+                    placeholder={getTranslation(language, 'common.yourName')}
                   />
                 </div>
 
@@ -123,7 +123,7 @@ export default function ContactPage() {
                     onChange={handleInputChange}
                     required
                     className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
-                    placeholder={language === 'en' ? 'your@email.com' : 'vas@email.com'}
+                    placeholder={getTranslation(language, 'common.yourEmail')}
                   />
                 </div>
 
@@ -139,7 +139,7 @@ export default function ContactPage() {
                     required
                     rows={6}
                     className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground resize-none"
-                    placeholder={language === 'en' ? 'Tell us how we can help you...' : 'Кажете ни како можеме да ви помогнеме...'}
+                    placeholder={getTranslation(language, 'common.yourMessage')}
                   />
                 </div>
 
@@ -151,7 +151,7 @@ export default function ContactPage() {
                   {isSubmitting ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div>
-                      <span>{language === 'en' ? 'Sending...' : 'Испраќање...'}</span>
+                      <span>{getTranslation(language, 'common.sending')}</span>
                     </>
                   ) : (
                     <>
@@ -174,7 +174,7 @@ export default function ContactPage() {
               {/* Contact Details */}
               <div className="bg-card p-8 rounded-lg shadow-md border border-border h-full">
                 <h2 className="text-2xl font-bold text-foreground mb-6">
-                  {language === 'en' ? 'Get in Touch' : 'Контактирајте не'}
+                  {getTranslation(language, 'common.getInTouch')}
                 </h2>
                 
                 <div className="space-y-6 flex flex-col h-full">
@@ -210,7 +210,7 @@ export default function ContactPage() {
                         rel="noopener noreferrer"
                         className="text-primary hover:text-accent font-medium transition-colors"
                       >
-                        {language === 'en' ? 'Follow us on Instagram' : 'Следете не на Instagram'}
+                        {getTranslation(language, 'common.followInstagram')}
                       </a>
                       <p className="text-sm text-muted-foreground mt-2">
                         {language === 'en' 
@@ -236,7 +236,7 @@ export default function ContactPage() {
                             className="w-48 h-48 mx-auto mb-2"
                           />
                           <p className="text-sm text-muted-foreground">
-                            {language === 'en' ? 'Scan to contact us' : 'Скенирајте за контакт'}
+                            {getTranslation(language, 'common.scanContact')}
                           </p>
                         </div>
                       </div>

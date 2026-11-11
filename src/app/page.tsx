@@ -164,7 +164,7 @@ export default function HomePage() {
                 <Home className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                {language === 'en' ? 'Premium Quality' : 'Премиум Квалитет'}
+                {getTranslation(language, 'common.premiumQuality')}
               </h3>
               <p className="text-muted-foreground">
                 {language === 'en' 
@@ -179,7 +179,7 @@ export default function HomePage() {
                 <Home className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                {language === 'en' ? 'Expert Support' : 'Експертска Поддршка'}
+                {getTranslation(language, 'common.expertSupport')}
               </h3>
               <p className="text-muted-foreground">
                 {language === 'en' 
@@ -194,7 +194,7 @@ export default function HomePage() {
                 <Home className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                {language === 'en' ? 'Fast Delivery' : 'Брза Достава'}
+                {getTranslation(language, 'common.fastDelivery')}
               </h3>
               <p className="text-muted-foreground">
                 {language === 'en' 

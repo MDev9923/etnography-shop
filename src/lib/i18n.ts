@@ -79,6 +79,9 @@ export const translations: Record<Language, Translation> = {
         followInstagram: 'Follow us on Instagram',
         scanContact: 'Scan to contact us',
         allRightsReserved: 'All rights reserved.',
+        hello: 'Hello,',
+        howToPurchase: 'How to Purchase',
+        purchaseInfo: 'Contact us via Instagram (@_etnography), or click "Email for Order" to open a prepared message in Gmail. We will respond with availability and payment details.',
       },
       conditions: {
         likeNew: 'Like New',
@@ -307,6 +310,9 @@ export const translations: Record<Language, Translation> = {
         followInstagram: 'Следете не на Instagram',
         scanContact: 'Скенирајте за контакт',
         allRightsReserved: 'Сите права се задржани.',
+        hello: 'Здраво,',
+        howToPurchase: 'Како да купите',
+        purchaseInfo: 'Контактирајте нè преку Instagram (@_etnography), или кликнете на "Е-пошта за Нарачка" за да отворите подготвена порака во Gmail. Ќе одговориме со информации за достапност и детали за плаќање.',
       },
       conditions: {
         likeNew: 'Како Ново',
