@@ -42,7 +42,11 @@ export const translations: Record<Language, Translation> = {
         lens: 'Lenses',
         accessory: 'Accessories',
         camcorder: 'Camcorders',
-        film: 'Film'
+        film: 'Film',
+        flash: 'Flash',
+        case: 'Case',
+        cardReader: 'Card Reader',
+        lensFilter: 'Lens Filter'
       },
       types: {
         film: 'Film',
@@ -273,7 +277,11 @@ export const translations: Record<Language, Translation> = {
         lens: 'Објективи',
         accessory: 'Додатоци',
         camcorder: 'Камкордери',
-        film: 'Филм'
+        film: 'Филм',
+        flash: 'Блиц',
+        case: 'Футрола',
+        cardReader: 'Читач на картички',
+        lensFilter: 'Филтер за објектив'
       },
       types: {
         film: 'Филм',

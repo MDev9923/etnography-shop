@@ -1217,6 +1217,7 @@ export default function AdminDashboard() {
                   <th className="px-4 py-3 hidden md:table-cell">Category</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Price</th>
+                  <th className="px-4 py-3 hidden lg:table-cell">General Note</th>
                   <th className="px-4 py-3">Visible</th>
                   <th className="px-4 py-3">Actions</th>
                 </tr>
@@ -1269,6 +1270,10 @@ export default function AdminDashboard() {
                       {product.priceEUR != null
                         ? `€${Math.round(product.priceEUR)}`
                         : '—'}
+                    </td>
+
+                    <td className="px-4 py-3 text-gray-600 hidden lg:table-cell max-w-xs truncate" title={product.general_note || ''}>
+                      {product.general_note || '—'}
                     </td>
 
                     <td className="px-4 py-3">
@@ -1426,6 +1431,10 @@ export default function AdminDashboard() {
                     <option value="lens">Lens</option>
                     <option value="film">Film</option>
                     <option value="accessory">Accessory</option>
+                    <option value="flash">Flash</option>
+                    <option value="case">Case</option>
+                    <option value="cardReader">Card Reader</option>
+                    <option value="lensFilter">Lens Filter</option>
                   </select>
                 </label>
 

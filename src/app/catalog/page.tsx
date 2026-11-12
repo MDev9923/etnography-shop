@@ -294,6 +294,18 @@ export default function CatalogPage() {
           <option value="film">
             {getTranslation(language, 'catalog.categories.film')}
           </option>
+          <option value="flash">
+            {getTranslation(language, 'catalog.categories.flash')}
+          </option>
+          <option value="case">
+            {getTranslation(language, 'catalog.categories.case')}
+          </option>
+          <option value="cardReader">
+            {getTranslation(language, 'catalog.categories.cardReader')}
+          </option>
+          <option value="lensFilter">
+            {getTranslation(language, 'catalog.categories.lensFilter')}
+          </option>
         </select>
       </div>
 
