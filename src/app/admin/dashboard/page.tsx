@@ -267,13 +267,11 @@ export default function AdminDashboard() {
     paidBy: ''
   });
   const [soldFilters, setSoldFilters] = useState({
-    dateFrom: '',
-    dateTo: '',
+    dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    dateTo: new Date().toISOString().split('T')[0],
     purchasedBy: '',
     visible: '',
-    expenseDateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    expenseDateTo: new Date().toISOString().split('T')[0],
-    expensePaidBy: ''
+    paidBy: ''
   });
 
   const fetchFinancialSummary = useCallback(async () => {
@@ -281,15 +279,6 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('adminToken');
       const params = new URLSearchParams();
 
-      if (soldFilters.expenseDateFrom) {
-        params.append('expenseDateFrom', soldFilters.expenseDateFrom);
-      }
-      if (soldFilters.expenseDateTo) {
-        params.append('expenseDateTo', soldFilters.expenseDateTo);
-      }
-      if (soldFilters.expensePaidBy) {
-        params.append('expensePaidBy', soldFilters.expensePaidBy);
-      }
       if (soldFilters.dateFrom) {
         params.append('dateFrom', soldFilters.dateFrom);
       }
@@ -301,6 +290,9 @@ export default function AdminDashboard() {
       }
       if (soldFilters.visible) {
         params.append('visible', soldFilters.visible);
+      }
+      if (soldFilters.paidBy) {
+        params.append('paidBy', soldFilters.paidBy);
       }
 
       const response = await fetch(`${API_URL}/api/admin/financial-summary?${params.toString()}`, {
@@ -894,7 +886,7 @@ export default function AdminDashboard() {
             {/* Filters */}
             <div className="bg-white rounded-lg shadow p-6">
               <h3 className="text-lg font-bold mb-4 text-black">Филтри</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="block text-xs text-gray-600">Датум од</label>
                   <input
@@ -931,27 +923,10 @@ export default function AdminDashboard() {
                     <option value="visible">Видливо</option>
                     <option value="hidden">Скриено</option>
                   </select>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-xs text-gray-600">Датум од (Трошоци)</label>
-                  <input
-                    type="date"
-                    value={soldFilters.expenseDateFrom}
-                    onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateFrom: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
-                  />
-                  <label className="block text-xs text-gray-600">Датум до (Трошоци)</label>
-                  <input
-                    type="date"
-                    value={soldFilters.expenseDateTo}
-                    onChange={(e) => setSoldFilters(prev => ({ ...prev, expenseDateTo: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
-                  />
-                  <label className="block text-xs text-gray-600">Платено од (Трошоци)</label>
+                  <label className="block text-xs text-gray-600">Платено од</label>
                   <select
-                    value={soldFilters.expensePaidBy}
-                    onChange={(e) => setSoldFilters(prev => ({ ...prev, expensePaidBy: e.target.value }))}
+                    value={soldFilters.paidBy}
+                    onChange={(e) => setSoldFilters(prev => ({ ...prev, paidBy: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
                   >
                     <option value="">Сите</option>
@@ -963,13 +938,11 @@ export default function AdminDashboard() {
                 <div className="flex items-end gap-2">
                   <button
                     onClick={() => setSoldFilters({
-                      dateFrom: '',
-                      dateTo: '',
+                      dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                      dateTo: new Date().toISOString().split('T')[0],
                       purchasedBy: '',
                       visible: '',
-                      expenseDateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                      expenseDateTo: new Date().toISOString().split('T')[0],
-                      expensePaidBy: ''
+                      paidBy: ''
                     })}
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
                   >

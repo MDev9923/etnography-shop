@@ -7,7 +7,7 @@ import { getTranslation } from '@/lib/i18n';
 import { useApp } from '@/lib/context';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Home } from 'lucide-react';
+import { ArrowRight, Home, Award, Headphones, Truck } from 'lucide-react';
 
 type Product = {
   id: number;
@@ -161,7 +161,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="bg-primary/10 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Home className="h-8 w-8 text-primary" />
+                <Award className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 {getTranslation(language, 'common.premiumQuality')}
@@ -176,7 +176,7 @@ export default function HomePage() {
             
             <div className="text-center">
               <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Home className="h-8 w-8 text-green-600" />
+                <Headphones className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 {getTranslation(language, 'common.expertSupport')}
@@ -191,7 +191,7 @@ export default function HomePage() {
             
             <div className="text-center">
               <div className="bg-accent rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Home className="h-8 w-8 text-primary" />
+                <Truck className="h-8 w-8 text-primary" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 {getTranslation(language, 'common.fastDelivery')}

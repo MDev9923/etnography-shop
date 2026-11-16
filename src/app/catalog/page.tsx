@@ -213,7 +213,7 @@ export default function CatalogPage() {
               : 'bg-card text-foreground border border-border hover:bg-muted'
           }`}
         >
-          {getTranslation(language, 'common.showSold')}
+          {getTranslation(language, 'catalog.common.showSold')}
         </button>
       </div>
 
