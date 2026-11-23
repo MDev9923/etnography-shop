@@ -185,9 +185,9 @@ export function ProductCard({
         <div className="mt-auto flex gap-2">
           <Link
             href={productUrl}
-            className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
+            className="flex-1 bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-1.5 text-sm"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-3.5 w-3.5" />
 
             <span>
               {getTranslation(language, 'common.viewDetails')}
@@ -202,13 +202,13 @@ export function ProductCard({
                 }
               }}
               disabled={!canAdd}
-              className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 ${
+              className={`flex-1 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-colors duration-200 text-sm ${
                 canAdd
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              <ShoppingCart className="h-4 w-4" />
+              <ShoppingCart className="h-3.5 w-3.5" />
               <span>
                 {getTranslation(language, 'common.addToCart')}
               </span>

@@ -817,13 +817,13 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                 type="button"
                 onClick={handleInstagramDM}
                 disabled={isSold}
-                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
+                className={`flex-1 px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${
                   isSold
                     ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
                     : 'bg-gradient-to-r from-primary to-accent text-primary-foreground hover:from-accent hover:to-primary'
                 }`}
               >
-                <Instagram className="h-5 w-5" />
+                <Instagram className="h-4 w-4" />
 
                 <span>
                   {isSold
@@ -844,9 +844,9 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                   }
                 }}
                 disabled={isSold || !canAdd}
-                className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-accent transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ShoppingCart className="h-5 w-5" />
+                <ShoppingCart className="h-4 w-4" />
                 <span>{getTranslation(language, 'common.addToCart')}</span>
               </button>
             </div>
