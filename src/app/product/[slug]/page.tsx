@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useApp } from '@/lib/context';
@@ -27,7 +28,7 @@ import {
   Maximize2,
   Minimize2,
   CreditCard,
-  Link,
+  Link as LinkIcon,
   ShoppingCart,
   Minus,
   Plus,
@@ -87,8 +88,8 @@ function getAccessoryIcon(accessoryId: string): any {
     'data-cable': Cable,
     'charger': Plug,
     'battery': Battery,
-    'strap': Link,
-    'lens-strap': Link,
+    'strap': LinkIcon,
+    'lens-strap': LinkIcon,
     'film': Film,
     'lens-cap': Minimize2,
     'custom': Package,
@@ -124,7 +125,7 @@ function getImageUrl(value?: string): string {
 
 export default function ProductPage() {
   const { language, currency } = useApp();
-  const { addToCart, updateQuantity } = useCart();
+  const { addToCart, updateQuantity, canAddToCart, getCartQuantity } = useCart();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -133,10 +134,15 @@ export default function ProductPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'specifications' | 'included'>('specifications');
   const [cartQuantity, setCartQuantity] = useState(1);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const product = allProducts.find(
     (item) => String(item.slug) === slug
   );
+
+  const maxQuantity = product?.quantity ?? 1;
+  const cartQuantityInCart = product ? getCartQuantity(product.id) : 0;
+  const canAdd = product ? canAddToCart(product.id, maxQuantity) : false;
 
   // Reset cart quantity when product changes
   useEffect(() => {
@@ -271,12 +277,16 @@ export default function ProductPage() {
     `catalog.categories.${product.category}`
   );
 
+  const categoryFilterUrl = `/catalog?category=${product.category}`;
+
   const typeText = product.filmDigital
     ? getTranslation(
         language,
         `catalog.types.${product.filmDigital}`
       )
     : '';
+
+  const typeFilterUrl = product.filmDigital ? `/catalog?type=${product.filmDigital}` : '';
 
   const validImages = (product.images || []).filter(
     (image) =>
@@ -481,15 +491,15 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
           <div className="min-w-0 space-y-6">
             <div>
               <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mb-2">
-                <span className="text-sm text-gray-500">
+                <Link href={`/catalog?brand=${product.brand}`} className="text-sm text-gray-500 hover:text-blue-600 hover:underline">
                   {product.brand}
-                </span>
+                </Link>
 
                 <span className="text-gray-300">•</span>
 
-                <span className="text-sm text-gray-500">
+                <Link href={categoryFilterUrl} className="text-sm text-gray-500 hover:text-blue-600 hover:underline">
                   {categoryText}
-                </span>
+                </Link>
 
                 {typeText && (
                   <>
@@ -497,9 +507,9 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
                       •
                     </span>
 
-                    <span className="text-sm text-gray-500">
+                    <Link href={typeFilterUrl} className="text-sm text-gray-500 hover:text-blue-600 hover:underline">
                       {typeText}
-                    </span>
+                    </Link>
                   </>
                 )}
               </div>
@@ -829,30 +839,65 @@ className="relative aspect-square w-full bg-white rounded-lg border border-gray-
               <button
                 type="button"
                 onClick={() => {
-                  // Add single item with quantity
-                  addToCart({
-                    id: product.id,
-                    slug: product.slug,
-                    name: product.name[language] || product.name.en,
-                    nameEN: product.name.en,
-                    nameMK: product.name.mk,
-                    brand: product.brand,
-                    priceEUR: product.priceEUR,
-                    priceMKD: product.priceMKD,
-                    image: product.images?.[0] ? getImageUrl(product.images[0]) : '/placeholder-product.jpg',
-                  });
-                  // If quantity > 1, update it
-                  if (cartQuantity > 1) {
-                    updateQuantity(product.id, cartQuantity);
+                  if (canAdd) {
+                    setShowConfirm(true);
                   }
                 }}
-                disabled={isSold}
+                disabled={isSold || !canAdd}
                 className="flex-1 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-accent transition-colors duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingCart className="h-5 w-5" />
                 <span>{getTranslation(language, 'common.addToCart')}</span>
               </button>
             </div>
+
+            {/* Confirm Add to Cart Modal */}
+            {showConfirm && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                  <h3 className="text-lg font-semibold mb-2">
+                    {getTranslation(language, 'common.addToCart')}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {getTranslation(language, 'common.addToCartConfirm', {
+                      productName: product.name[language] || product.name.en,
+                    })}
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setShowConfirm(false)}
+                      className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                    >
+                      {getTranslation(language, 'common.cancel')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        addToCart({
+                          id: product.id,
+                          slug: product.slug,
+                          name: product.name[language] || product.name.en,
+                          nameEN: product.name.en,
+                          nameMK: product.name.mk,
+                          brand: product.brand,
+                          priceEUR: product.priceEUR,
+                          priceMKD: product.priceMKD,
+                          image: product.images?.[0] ? getImageUrl(product.images[0]) : '/placeholder-product.jpg',
+                          maxQuantity,
+                        });
+                        // If quantity > 1, update it
+                        if (cartQuantity > 1) {
+                          updateQuantity(product.id, cartQuantity);
+                        }
+                        setShowConfirm(false);
+                      }}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      {getTranslation(language, 'common.confirm')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="bg-card border border-border rounded-lg p-4">
               <div className="flex items-start gap-3">

@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import { getTranslation } from '@/lib/i18n';
 import { formatPrice } from '@/lib/utils';
 import { Eye, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
 
 const API_URL = (
   process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3003'
@@ -69,7 +70,8 @@ export function ProductCard({
   showConditionBadge = true,
 }: ProductCardProps) {
   const { language, currency } = useApp();
-  const { addToCart } = useCart();
+  const { addToCart, canAddToCart, getCartQuantity } = useCart();
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const price =
     currency === 'EUR' ? product.priceEUR : product.priceMKD;
@@ -90,6 +92,10 @@ export function ProductCard({
   const isSold = product.status === 'sold';
   const imageUrl = getImageUrl(product.images?.[0]);
   const productUrl = `/product/${product.slug}`;
+
+  const maxQuantity = product.quantity ?? 1;
+  const cartQuantity = getCartQuantity(product.id);
+  const canAdd = canAddToCart(product.id, maxQuantity);
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
@@ -176,17 +182,84 @@ export function ProductCard({
           </div>
         </div>
 
-        <Link
-          href={productUrl}
-          className="mt-auto w-full bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
-        >
-          <Eye className="h-4 w-4" />
+        <div className="mt-auto flex gap-2">
+          <Link
+            href={productUrl}
+            className="flex-1 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center justify-center gap-2"
+          >
+            <Eye className="h-4 w-4" />
 
-          <span>
-            {getTranslation(language, 'common.viewDetails')}
-          </span>
-        </Link>
+            <span>
+              {getTranslation(language, 'common.viewDetails')}
+            </span>
+          </Link>
+
+          {!isSold && (
+            <button
+              onClick={() => {
+                if (canAdd) {
+                  setShowConfirm(true);
+                }
+              }}
+              disabled={!canAdd}
+              className={`flex-1 px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 ${
+                canAdd
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <ShoppingCart className="h-4 w-4" />
+              <span>
+                {getTranslation(language, 'common.addToCart')}
+              </span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* Confirm Add to Cart Modal */}
+      {showConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold mb-2">
+              {getTranslation(language, 'common.addToCart')}
+            </h3>
+            <p className="text-gray-600 mb-4">
+              {getTranslation(language, 'common.addToCartConfirm', {
+                productName: productName,
+              })}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
+                {getTranslation(language, 'common.cancel')}
+              </button>
+              <button
+                onClick={() => {
+                  addToCart({
+                    id: product.id,
+                    slug: product.slug,
+                    name: productName,
+                    brand: product.brand,
+                    priceEUR: product.priceEUR,
+                    priceMKD: product.priceMKD,
+                    image: imageUrl,
+                    nameEN: product.name.en,
+                    nameMK: product.name.mk,
+                    maxQuantity,
+                  });
+                  setShowConfirm(false);
+                }}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                {getTranslation(language, 'common.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

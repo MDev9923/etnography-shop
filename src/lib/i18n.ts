@@ -208,6 +208,7 @@ export const translations: Record<Language, Translation> = {
       no: 'No',
       noResults: 'No products found',
       addToCart: 'Add to Cart',
+      addToCartConfirm: 'Are you sure you want to add {productName} to your cart?',
       outOfStock: 'Out of Stock',
       inStock: 'In Stock',
       page: 'Page',
@@ -450,6 +451,7 @@ export const translations: Record<Language, Translation> = {
       no: 'Не',
       noResults: 'Не се пронајдени производи',
       addToCart: 'Додај во кошничка',
+      addToCartConfirm: 'Дали сте сигурни дека сакате да додадете {productName} во вашата кошничка?',
       outOfStock: 'Нема на залиха',
       inStock: 'Достапно',
       page: 'Страница',
@@ -482,7 +484,7 @@ export const translations: Record<Language, Translation> = {
     }
   }
 };
-export function getTranslation(lang: Language, path: string): string {
+export function getTranslation(lang: Language, path: string, params?: Record<string, string>): string {
   const keys = path.split('.');
   let current: any = translations[lang];
   for (const key of keys) {
@@ -492,5 +494,14 @@ export function getTranslation(lang: Language, path: string): string {
       return path;
     }
   }
-  return typeof current === 'string' ? current : path;
+  let result = typeof current === 'string' ? current : path;
+
+  // Replace placeholders like {productName}
+  if (params && typeof result === 'string') {
+    for (const [key, value] of Object.entries(params)) {
+      result = result.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+    }
+  }
+
+  return result;
 }

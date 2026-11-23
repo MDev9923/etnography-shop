@@ -269,9 +269,7 @@ export default function AdminDashboard() {
   const [soldFilters, setSoldFilters] = useState({
     dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     dateTo: new Date().toISOString().split('T')[0],
-    purchasedBy: '',
-    visible: '',
-    paidBy: ''
+    purchasedBy: ''
   });
 
   const fetchFinancialSummary = useCallback(async () => {
@@ -287,12 +285,6 @@ export default function AdminDashboard() {
       }
       if (soldFilters.purchasedBy) {
         params.append('purchasedBy', soldFilters.purchasedBy);
-      }
-      if (soldFilters.visible) {
-        params.append('visible', soldFilters.visible);
-      }
-      if (soldFilters.paidBy) {
-        params.append('paidBy', soldFilters.paidBy);
       }
 
       const response = await fetch(`${API_URL}/api/admin/financial-summary?${params.toString()}`, {
@@ -913,26 +905,6 @@ export default function AdminDashboard() {
                     <option value="Gogo">Gogo</option>
                     <option value="Drugo">Drugo</option>
                   </select>
-                  <label className="block text-xs text-gray-600">Видливост</label>
-                  <select
-                    value={soldFilters.visible}
-                    onChange={(e) => setSoldFilters(prev => ({ ...prev, visible: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
-                  >
-                    <option value="">Сите</option>
-                    <option value="visible">Видливо</option>
-                    <option value="hidden">Скриено</option>
-                  </select>
-                  <label className="block text-xs text-gray-600">Платено од</label>
-                  <select
-                    value={soldFilters.paidBy}
-                    onChange={(e) => setSoldFilters(prev => ({ ...prev, paidBy: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-600"
-                  >
-                    <option value="">Сите</option>
-                    <option value="Matej">Matej</option>
-                    <option value="Gogo">Gogo</option>
-                  </select>
                 </div>
 
                 <div className="flex items-end gap-2">
@@ -940,9 +912,7 @@ export default function AdminDashboard() {
                     onClick={() => setSoldFilters({
                       dateFrom: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                       dateTo: new Date().toISOString().split('T')[0],
-                      purchasedBy: '',
-                      visible: '',
-                      paidBy: ''
+                      purchasedBy: ''
                     })}
                     className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
                   >

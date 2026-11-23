@@ -13,6 +13,7 @@ export interface CartItem {
   quantity: number;
   nameEN: string;
   nameMK: string;
+  maxQuantity: number;
 }
 
 interface CartContextType {
@@ -23,6 +24,8 @@ interface CartContextType {
   clearCart: () => void;
   cartTotal: { EUR: number; MKD: number };
   cartCount: number;
+  canAddToCart: (id: number, maxQuantity: number) => boolean;
+  getCartQuantity: (id: number) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -51,13 +54,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCart((prevCart) => {
       const existingItem = prevCart.find((i) => i.id === item.id);
       if (existingItem) {
-        // Increment quantity if item already exists
-        return prevCart.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
+        // Increment quantity if item already exists and not at max
+        if (existingItem.quantity < item.maxQuantity) {
+          return prevCart.map((i) =>
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          );
+        }
+        return prevCart;
       }
       return [...prevCart, { ...item, quantity: 1, nameEN: item.name, nameMK: item.name }];
     });
+  };
+
+  const canAddToCart = (id: number, maxQuantity: number) => {
+    const existingItem = cart.find((i) => i.id === id);
+    if (!existingItem) return true;
+    return existingItem.quantity < maxQuantity;
+  };
+
+  const getCartQuantity = (id: number) => {
+    const existingItem = cart.find((i) => i.id === id);
+    return existingItem ? existingItem.quantity : 0;
   };
 
   const removeFromCart = (id: number) => {
@@ -98,6 +115,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         cartTotal,
         cartCount,
+        canAddToCart,
+        getCartQuantity,
       }}
     >
       {children}
