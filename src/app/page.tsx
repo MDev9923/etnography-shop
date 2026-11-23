@@ -198,8 +198,8 @@ export default function HomePage() {
               </h3>
               <p className="text-muted-foreground">
                 {language === 'en' 
-                  ? 'Quick and secure delivery to your doorstep'
-                  : 'Брза и сигурна достава до вашата врата'
+                  ? 'Quick and secure delivery to your doorstep, Free shipping for orders over 2500 MKD via Cargo service, and free delivery for Skopje'
+                  : 'Брза и сигурна достава до вашата врата, Бесплатна достава за порачки над 2500 MKD преку Карго служба, и Бесплатна испорака за Скопје'
                 }
               </p>
             </div>
