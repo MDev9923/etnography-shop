@@ -68,6 +68,8 @@ interface Product {
   purchased_by_note?: string | null;
   general_note?: string | null;
   visible_in_catalog?: number;
+  thumbnail_index?: number;
+  exclude_from_financials?: number;
 
   // Camera specifications
   megapixels?: string | null;
@@ -103,6 +105,7 @@ interface ProductForm {
   description_en: string;
   description_mk: string;
   images: string[];
+  thumbnail_index: number;
   // New sold fields
   selling_price_eur: string;
   selling_price_mkd: string;
@@ -113,6 +116,7 @@ interface ProductForm {
   purchased_by_note: string;
   general_note: string;
   visible_in_catalog: boolean;
+  exclude_from_financials: boolean;
   quantity: string;
   // Camera specifications
   megapixels: string;
@@ -147,6 +151,7 @@ function createEmptyForm(): ProductForm {
     description_en: '',
     description_mk: '',
     images: [],
+    thumbnail_index: 0,
     selling_price_eur: '',
     selling_price_mkd: '',
     sold_date: '',
@@ -156,6 +161,7 @@ function createEmptyForm(): ProductForm {
     purchased_by_note: '',
     general_note: '',
     visible_in_catalog: true,
+    exclude_from_financials: false,
     quantity: '1',
     megapixels: '',
     battery_type: '',
@@ -632,6 +638,7 @@ export default function AdminDashboard() {
         },
         specs: editingProduct?.specs || {},
         images: formData.images.map(getImageUrl),
+        thumbnailIndex: formData.thumbnail_index,
         // Sold fields
         sellingPriceEUR: formData.selling_price_eur === '' ? null : Number(formData.selling_price_eur),
         sellingPriceMKD: formData.selling_price_mkd === '' ? null : Number(formData.selling_price_mkd),
@@ -642,6 +649,7 @@ export default function AdminDashboard() {
         purchasedByNote: formData.purchased_by_note || null,
         generalNote: formData.general_note || null,
         visibleInCatalog: formData.visible_in_catalog,
+        excludeFromFinancials: formData.exclude_from_financials,
         quantity: (() => {
           const qty = formData.quantity === '' ? 1 : Number(formData.quantity);
           // If marking as sold and editing a product with quantity > 1, decrement
@@ -715,6 +723,7 @@ export default function AdminDashboard() {
       description_mk:
         product.description?.mk ?? product.description_mk ?? '',
       images: (product.images || []).map(getImageUrl),
+      thumbnail_index: product.thumbnail_index ?? 0,
       selling_price_eur: product.selling_price_eur == null ? '' : String(product.selling_price_eur),
       selling_price_mkd: product.selling_price_mkd == null ? '' : String(product.selling_price_mkd),
       sold_date: product.sold_date || '',
@@ -724,6 +733,7 @@ export default function AdminDashboard() {
       purchased_by_note: product.purchased_by_note || '',
       general_note: product.general_note || '',
       visible_in_catalog: product.visible_in_catalog === 1,
+      exclude_from_financials: product.exclude_from_financials === 1,
       quantity: product.quantity == null ? '1' : String(product.quantity),
       megapixels: product.megapixels || '',
       battery_type: product.batteryType || '',
@@ -802,6 +812,39 @@ export default function AdminDashboard() {
     } catch (err) {
       alert(
         err instanceof Error ? err.message : 'Failed to update product visibility'
+      );
+    }
+  }
+
+  const handleToggleExcludeFromFinancials = async (product: any) => {
+    const token = localStorage.getItem('adminToken');
+
+    if (!token) {
+      router.replace('/admin/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/products/${product.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...product,
+          excludeFromFinancials: product.exclude_from_financials === 1 ? 0 : 1,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product exclude status');
+      }
+
+      await fetchFinancialSummary();
+    } catch (err) {
+      alert(
+        err instanceof Error ? err.message : 'Failed to update product exclude status'
       );
     }
   }
@@ -977,6 +1020,7 @@ export default function AdminDashboard() {
                           <th className="px-4 py-3 text-black">Матеј</th>
                           <th className="px-4 py-3 text-black">Гого</th>
                           <th className="px-4 py-3 text-black">Видливо</th>
+                          <th className="px-4 py-3 text-black">Исклучи</th>
                           <th className="px-4 py-3 text-black">Датум на Продажба</th>
                         </tr>
                       </thead>
@@ -996,6 +1040,15 @@ export default function AdminDashboard() {
                               ) : (
                                 <EyeOff className="h-5 w-5 text-gray-400" />
                               )}
+                            </td>
+                            <td className="px-4 py-3 text-black">
+                              <button
+                                onClick={() => void handleToggleExcludeFromFinancials(product)}
+                                aria-label={product.exclude_from_financials ? 'Include in financials' : 'Exclude from financials'}
+                                className={product.exclude_from_financials ? 'text-red-600 hover:text-red-800' : 'text-gray-400 hover:text-gray-600'}
+                              >
+                                {product.exclude_from_financials ? <X className="h-5 w-5" /> : <div className="h-5 w-5" />}
+                              </button>
                             </td>
                             <td className="px-4 py-3 text-sm text-black">{product.soldDate ? new Date(product.soldDate).toLocaleDateString() : '-'}</td>
                           </tr>
@@ -1645,7 +1698,8 @@ export default function AdminDashboard() {
                         <img
                           src={getImageUrl(image)}
                           alt={`Product image ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-lg"
+                          className={`w-full h-24 object-cover rounded-lg cursor-pointer ${formData.thumbnail_index === index ? 'ring-4 ring-blue-500' : ''}`}
+                          onClick={() => setFormData(prev => ({ ...prev, thumbnail_index: index }))}
                         />
                         <button
                           type="button"
@@ -1656,6 +1710,11 @@ export default function AdminDashboard() {
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
+                        {formData.thumbnail_index === index && (
+                          <div className="absolute bottom-1 left-1 bg-blue-600 text-white px-2 py-0.5 rounded text-xs font-medium">
+                            Thumbnail
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -2163,6 +2222,26 @@ export default function AdminDashboard() {
                       className={`${inputClass} mt-1`}
                       placeholder="Additional notes about this product..."
                     />
+                  </label>
+
+                  <label className="block text-sm font-medium text-gray-700">
+                    Exclude from Financial Summary / Исклучи од Финансиски Преглед
+                    <div className="flex items-center mt-1">
+                      <input
+                        type="checkbox"
+                        checked={formData.exclude_from_financials}
+                        onChange={(e) =>
+                          setFormData((previous) => ({
+                            ...previous,
+                            exclude_from_financials: e.target.checked,
+                          }))
+                        }
+                        className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
+                      />
+                      <span className="ml-2 text-sm text-gray-600">
+                        Check to exclude this product from financial calculations
+                      </span>
+                    </div>
                   </label>
                 </div>
               </div>

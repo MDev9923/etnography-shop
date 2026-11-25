@@ -14,6 +14,9 @@ export const metadata = {
   title: 'Etnography - Professional Photography Equipment',
   description: 'Discover premium analog and digital cameras, lenses, and accessories for professional and amateur photographers in Skopje, Macedonia.',
   keywords: 'camera, photography, lenses, analog, digital, photo equipment, etnography, skopje, macedonia',
+  icons: {
+    icon: '/favicon.png',
+  },
   openGraph: {
     title: 'Etnography - Professional Photography Equipment',
     description: 'Discover premium analog and digital cameras, lenses, and accessories in Skopje, Macedonia.',
